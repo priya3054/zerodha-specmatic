@@ -1,0 +1,78 @@
+services:
+
+  # MongoDB — required by backend
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Your real Express + MongoDB backend (port 3002)
+  backend:
+    build: ./backend
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    working_dir: /app
+    command: npm start
+    environment:
+      - PORT=3002
+      - MONGO_URL=mongodb://mongo:27017/zerodha
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-test_key}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-test_secret}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # LAB 1 — Provider contract test: hits real backend, validates against contract
+  specmatic-test:
+    image: znsio/specmatic
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+    command: test --testBaseURL=http://backend:3002 contracts/openapi.yaml
+    depends_on:
+      - backend
+
+  # LAB 2 — Consumer stub: fake backend from contract, no real backend needed
+  specmatic-stub:
+    image: znsio/specmatic
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+    command: stub contracts/openapi.yaml --port=9000
+    ports:
+      - "9000:9000"
+
+  # LAB 4 — API Coverage: tests + coverage report
+  specmatic-coverage:
+    image: znsio/specmatic
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+    command: test --testBaseURL=http://backend:3002 contracts/openapi.yaml
+    depends_on:
+      - backend
+
+  # ALL LABS — Specmatic Studio: visual UI at http://localhost:9001/_specmatic/studio
+  studio:
+    image: znsio/specmatic
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+    command: stub contracts/openapi.yaml --port=9000
+    ports:
+      - "9001:9000"
+    profiles:
+      - studio
+
+volumes:
+  mongo-data:

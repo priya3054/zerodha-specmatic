@@ -1,0 +1,23 @@
+{
+  "http-request": {
+    "method": "GET",
+    "path": "/allHoldings"
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": [
+      {
+        "_id": "64abc123def456",
+        "name": "TCS",
+        "qty": 1,
+        "avg": 3041.70,
+        "price": 3194.80,
+        "net": "+5.03%",
+        "day": "-0.25%"
+      }
+    ]
+  }
+}

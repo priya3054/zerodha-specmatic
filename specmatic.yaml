@@ -1,0 +1,19 @@
+version: 2
+
+contracts:
+  - filesystem:
+      directory: contracts
+    provides:
+      - zerodha-backend
+
+report:
+  formatters:
+    - type: text
+    - type: html
+  types:
+    APICoverage:
+      OpenAPI:
+        successCriteria:
+          minThresholdPercentage: 60
+          maxMissedEndpointsInSpec: 3
+          enforce: true

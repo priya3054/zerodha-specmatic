@@ -389,7 +389,7 @@ app.post("/newOrder", async (req, res) => {
     order: newOrder,
   });
 
-  res.send("Order saved!");
+  res.json({message: "Order saved!"});
 });
 
 server.listen(PORT, async () => {
