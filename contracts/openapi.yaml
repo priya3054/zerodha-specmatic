@@ -344,8 +344,8 @@ components:
           type: string
           example: TCS
         qty:
-          type: string
-          example: "1"
+          type: number
+          example: 1
         avg:
           type: number
           example: 3041.70
