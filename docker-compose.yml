@@ -203,6 +203,17 @@ services:
     profiles:
       - filters-auth
 
+  # LAB: Filters + Studio — run the full suite (auto-starts mock + runs tests) via specmatic.yaml v3
+  specmatic-suite:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: run-suite
+    profiles:
+      - suite
+
   # ALL LABS — Specmatic Studio: visual UI at http://localhost:9000/_specmatic/studio
   studio:
     image: specmatic/enterprise:latest

@@ -1,25 +1,50 @@
-version: 2
+version: 3
 
-contracts:
-  - filesystem:
-      directory: contracts
-    provides:
-      - zerodha-backend
+# systemUnderTest: the real backend being tested
+# baseUrl points to the Specmatic mock (port 8080) so run-suite is self-contained
+systemUnderTest:
+  service:
+    definitions:
+      - definition:
+          source:
+            filesystem:
+              directory: contracts
+          specs:
+            - openapi.yaml
+    runOptions:
+      openapi:
+        type: test
+        baseUrl: "http://localhost:8080"
+    data:
+      examples:
+        - directories:
+            - ./contracts/openapi_examples
 
-# LAB: Filters — use --filter flag on the test command to scope test runs:
-#   --filter "STATUS='200'"                              → only happy-path tests
-#   --filter "METHOD='POST'"                             → only POST endpoint tests
-#   --filter "PATH='/auth/signup' || PATH='/auth/login'" → only auth tests
-# See docker-compose.yml services: specmatic-filter-status/post/auth
+# dependencies: the mock stub that run-suite starts automatically
+dependencies:
+  services:
+    - service:
+        definitions:
+          - definition:
+              source:
+                filesystem:
+                  directory: contracts
+              specs:
+                - openapi.yaml
+        runOptions:
+          openapi:
+            type: mock
+            host: 0.0.0.0
+            port: 8080
+        data:
+          examples:
+            - directories:
+                - ./contracts/openapi_examples
+          dictionary:
+            path: contracts/openapi_dictionary.yaml
 
-report:
-  formatters:
-    - type: text
-    - type: html
-  types:
-    APICoverage:
-      OpenAPI:
-        successCriteria:
-          minThresholdPercentage: 60
-          maxMissedEndpointsInSpec: 3
-          enforce: true
+specmatic:
+  settings:
+    test:
+      strictMode: true
+      schemaResiliencyTests: none
