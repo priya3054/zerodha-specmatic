@@ -276,6 +276,36 @@ services:
     profiles:
       - no-adapters
 
+  # LAB: Overlays — stub WITH overlay (OVERLAY_FILE_PATH env var patches spec at startup)
+  specmatic-overlay-stub:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    environment:
+      OVERLAY_FILE_PATH: contracts/openapi_overlay.yaml
+    command: stub contracts/openapi.yaml --examples=contracts/openapi_examples --port=9000
+    ports:
+      - "9000:9000"
+    profiles:
+      - overlays
+
+  # LAB: Overlays — test against overlay stub (sends to /v1/newOrder, not /newOrder)
+  specmatic-overlay-test:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    environment:
+      OVERLAY_FILE_PATH: contracts/openapi_overlay.yaml
+    command: test --testBaseURL=http://specmatic-overlay-stub:9000 contracts/openapi.yaml --examples=contracts/openapi_examples
+    depends_on:
+      - specmatic-overlay-stub
+    profiles:
+      - overlays
+
   # LAB: Filters + Studio — run the full suite (auto-starts mock + runs tests) via specmatic.yaml v3
   specmatic-suite:
     image: specmatic/enterprise:latest

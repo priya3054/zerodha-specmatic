@@ -1,0 +1,60 @@
+overlay: 1.0.0
+info:
+  title: Add /v1 prefix paths for Zerodha API gateway compatibility
+  version: "1.0"
+
+# LAB: Overlays — patch the contract at test time without editing openapi.yaml
+# Scenario: Zerodha backend is deployed behind an API gateway that adds /v1 prefix
+# Contract says: POST /newOrder       (what the spec file has)
+# Gateway serves: POST /v1/newOrder   (what the deployed backend actually exposes)
+# Overlay: adds /v1/newOrder, removes /newOrder — no spec file changes needed
+
+actions:
+  # ACTION 1: Add versioned path /v1/newOrder
+  - target: "$.paths"
+    update:
+      /v1/newOrder:
+        post:
+          summary: Place a new stock order (via API gateway /v1 prefix)
+          requestBody:
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  required:
+                    - name
+                    - qty
+                    - price
+                    - mode
+                  properties:
+                    name:
+                      type: string
+                      example: INFY
+                    qty:
+                      type: number
+                      example: 5
+                    price:
+                      type: number
+                      example: 1555.45
+                    mode:
+                      type: string
+                      enum:
+                        - BUY
+                        - SELL
+                      example: BUY
+          responses:
+            '200':
+              description: Order placed successfully
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Order saved!
+
+  # ACTION 2: Remove the original /newOrder path (gateway no longer exposes it directly)
+  - target: "$.paths['/newOrder']"
+    remove: true
