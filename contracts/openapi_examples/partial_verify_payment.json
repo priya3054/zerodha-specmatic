@@ -1,0 +1,24 @@
+{
+  "partial": {
+    "http-request": {
+      "method": "POST",
+      "path": "/verify-payment",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "razorpay_order_id": "order_test123",
+        "amount": 50000
+      }
+    },
+    "http-response": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "status": "success"
+      }
+    }
+  }
+}

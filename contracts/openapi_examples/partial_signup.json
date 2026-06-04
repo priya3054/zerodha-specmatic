@@ -1,0 +1,27 @@
+{
+  "partial": {
+    "http-request": {
+      "method": "POST",
+      "path": "/auth/signup",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "username": "newtrader",
+        "email": "newtrader@gmail.com"
+      }
+    },
+    "http-response": {
+      "status": 200,
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "user": {
+          "username": "newtrader",
+          "email": "newtrader@gmail.com"
+        }
+      }
+    }
+  }
+}
