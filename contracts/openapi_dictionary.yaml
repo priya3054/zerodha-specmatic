@@ -1,0 +1,52 @@
+'*':
+  username:
+  - newtrader
+  - testuser1
+  email:
+  - newtrader@gmail.com
+  password:
+  - testpass1
+  name:
+  - INFY
+  - RELIANCE
+  qty:
+  - 5
+  price:
+  - 1555.45
+  mode:
+  - BUY
+  - SELL
+  message:
+  - Order saved!
+  razorpay_order_id:
+  - order_test123
+  amount:
+  - 50000
+  status:
+  - success
+User:
+  username:
+  - newtrader
+  - testuser1
+  email:
+  - newtrader@gmail.com
+  - testuser1@gmail.com
+  _id:
+  - 64abc123def456
+  balance:
+  - 0
+Holding:
+  _id:
+  - 64abc123def456
+  name:
+  - TCS
+  qty:
+  - 1
+  avg:
+  - 3041.7
+  price:
+  - 3194.8
+  net:
+  - +5.03%
+  day:
+  - -0.25%
