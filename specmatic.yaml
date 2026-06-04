@@ -6,6 +6,11 @@ contracts:
     provides:
       - zerodha-backend
 
+# LAB: Filters — persist a STATUS='200' filter so CLI runs only test happy-path scenarios.
+# Comment this out to run all scenarios including error-path (400/401/500) tests.
+# Filter syntax: METHOD='POST', PATH='/auth/signup', STATUS='200', && || ! operators
+filter: "STATUS='200'"
+
 report:
   formatters:
     - type: text

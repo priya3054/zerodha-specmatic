@@ -149,6 +149,60 @@ services:
     profiles:
       - dictionary
 
+  # LAB: Filters — stub for filter experiments (shared across all filter profiles)
+  specmatic-filter-stub:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: stub contracts/openapi.yaml --examples=contracts/openapi_examples --port=9000
+    ports:
+      - "9000:9000"
+    profiles:
+      - filters
+      - filters-post
+      - filters-auth
+
+  # LAB: Filters — run ONLY STATUS=200 tests (happy-path focus)
+  specmatic-filter-status:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: ["test", "--testBaseURL=http://specmatic-filter-stub:9000", "contracts/openapi.yaml", "--filter", "STATUS='200'"]
+    depends_on:
+      - specmatic-filter-stub
+    profiles:
+      - filters
+
+  # LAB: Filters — run ONLY POST method tests
+  specmatic-filter-post:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: ["test", "--testBaseURL=http://specmatic-filter-stub:9000", "contracts/openapi.yaml", "--filter", "METHOD='POST'"]
+    depends_on:
+      - specmatic-filter-stub
+    profiles:
+      - filters-post
+
+  # LAB: Filters — run ONLY auth endpoint tests
+  specmatic-filter-auth:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: ["test", "--testBaseURL=http://specmatic-filter-stub:9000", "contracts/openapi.yaml", "--filter", "PATH='/auth/signup' || PATH='/auth/login'"]
+    depends_on:
+      - specmatic-filter-stub
+    profiles:
+      - filters-auth
+
   # ALL LABS — Specmatic Studio: visual UI at http://localhost:9000/_specmatic/studio
   studio:
     image: specmatic/enterprise:latest
