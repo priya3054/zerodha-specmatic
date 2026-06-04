@@ -6,10 +6,11 @@ contracts:
     provides:
       - zerodha-backend
 
-# LAB: Filters — persist a STATUS='200' filter so CLI runs only test happy-path scenarios.
-# Comment this out to run all scenarios including error-path (400/401/500) tests.
-# Filter syntax: METHOD='POST', PATH='/auth/signup', STATUS='200', && || ! operators
-filter: "STATUS='200'"
+# LAB: Filters — use --filter flag on the test command to scope test runs:
+#   --filter "STATUS='200'"                              → only happy-path tests
+#   --filter "METHOD='POST'"                             → only POST endpoint tests
+#   --filter "PATH='/auth/signup' || PATH='/auth/login'" → only auth tests
+# See docker-compose.yml services: specmatic-filter-status/post/auth
 
 report:
   formatters:
