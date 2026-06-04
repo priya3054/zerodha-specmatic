@@ -248,6 +248,8 @@ services:
       - .:/usr/src/app
       - ../license.txt:/specmatic/specmatic-license.txt:ro
     command: stub /usr/src/app/contracts/openapi.yaml --port=8081
+    ports:
+      - "8081:8081"
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8081/actuator/health >/dev/null 2>&1 || exit 1"]
       interval: 3s
