@@ -306,6 +306,42 @@ services:
     profiles:
       - overlays
 
+  # LAB: Workflow — stub for workflow demo (uses /tmp to avoid reading specmatic.yaml)
+  specmatic-workflow-stub:
+    image: specmatic/enterprise:latest
+    working_dir: /tmp
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: stub /usr/src/app/contracts/openapi.yaml --examples=/usr/src/app/contracts/openapi_examples --port=9000
+    ports:
+      - "9000:9000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9000/actuator/health >/dev/null 2>&1 || exit 1"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+      start_period: 5s
+    profiles:
+      - workflow
+
+  # LAB: Workflow — test only create-order + verify-payment to show ID propagation
+  specmatic-workflow-test:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: ["test", "--testBaseURL=http://specmatic-workflow-stub:9000",
+              "contracts/openapi.yaml",
+              "--examples=contracts/openapi_examples",
+              "--filter", "PATH='/create-order' || PATH='/verify-payment'"]
+    depends_on:
+      specmatic-workflow-stub:
+        condition: service_healthy
+    profiles:
+      - workflow
+
   # LAB: Filters + Studio — run the full suite (auto-starts mock + runs tests) via specmatic.yaml v3
   specmatic-suite:
     image: specmatic/enterprise:latest

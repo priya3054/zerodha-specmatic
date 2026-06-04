@@ -15,6 +15,14 @@ systemUnderTest:
       openapi:
         type: test
         baseUrl: "http://localhost:8080"
+        # LAB: Workflow — extract ID from create-order response, propagate to verify-payment.
+        # Specmatic v1.14.2 supports extract from BODY and use via PATH params only.
+        # Our Zerodha API uses body fields (not path params), so we demonstrate extract only.
+        # In the lab (tasks API), extracted task_id is injected via PATH.task_id into GET/PUT/DELETE.
+        workflow:
+          ids:
+            "POST /create-order -> 200":
+              extract: "BODY.id"
     data:
       examples:
         - directories:

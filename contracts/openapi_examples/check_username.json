@@ -1,0 +1,18 @@
+{
+  "http-request": {
+    "method": "GET",
+    "path": "/auth/check-username",
+    "query": {
+      "username": "hardcoded_testuser"
+    }
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "available": false
+    }
+  }
+}
