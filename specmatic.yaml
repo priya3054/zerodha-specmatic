@@ -42,6 +42,13 @@ dependencies:
                 - ./contracts/openapi_examples
           dictionary:
             path: contracts/openapi_dictionary.yaml
+  # LAB: Data Adapters — hook scripts that bridge client/spec format mismatches
+  # pre:  client sends PascalCase (Name, Qty, Price) → converts to camelCase before mock validates
+  # post: mock returns camelCase (message) → converts to PascalCase (Message) for client
+  data:
+    adapters:
+      pre_specmatic_request_processor: ./hooks/pre_specmatic_request_processor.sh
+      post_specmatic_response_processor: ./hooks/post_specmatic_response_processor.sh
 
 specmatic:
   settings:
