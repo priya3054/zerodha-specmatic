@@ -1,0 +1,28 @@
+{
+  "http-request": {
+    "method": "POST",
+    "path": "/auth/signup",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "(USERNAME:string)",
+      "email": "(EMAIL:string)",
+      "password": "(PASSWORD:string)"
+    }
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "user": {
+        "_id": "64abc123def456",
+        "username": "$(USERNAME)",
+        "email": "$(EMAIL)",
+        "balance": 0
+      }
+    }
+  }
+}

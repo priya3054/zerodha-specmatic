@@ -1,0 +1,27 @@
+{
+  "http-request": {
+    "method": "POST",
+    "path": "/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "newtrader",
+      "password": "traderpass"
+    }
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "user": {
+        "_id": "$match(exact:64abc789ghi012)",
+        "username": "$match(exact:newtrader)",
+        "email": "$match(exact:newtrader@gmail.com)",
+        "balance": "$match(dataType:number)"
+      }
+    }
+  }
+}

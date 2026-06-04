@@ -52,6 +52,41 @@ services:
     ports:
       - "9000:9000"
 
+  # External Examples Validation — validates ALL example JSONs (including partial) against contract schema
+  specmatic-examples:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: examples validate --contract-file=contracts/openapi.yaml --examples-dir=contracts/openapi_examples
+
+  # LAB: Partial Examples — stub server that serves partial examples (auto-generates missing required fields)
+  specmatic-partial-stub:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: stub contracts/openapi.yaml --examples=contracts/openapi_examples --port=9000
+    ports:
+      - "9000:9000"
+    profiles:
+      - partial
+
+  # LAB: Partial Examples loop test — runs contract tests against the partial-examples stub
+  specmatic-partial-test:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: test --testBaseURL=http://specmatic-partial-stub:9000 contracts/openapi.yaml
+    depends_on:
+      - specmatic-partial-stub
+    profiles:
+      - partial
+
   # LAB 4 — API Coverage: tests + coverage report
   specmatic-coverage:
     image: znsio/specmatic
@@ -62,15 +97,69 @@ services:
     depends_on:
       - backend
 
-  # ALL LABS — Specmatic Studio: visual UI at http://localhost:9001/_specmatic/studio
-  studio:
-    image: znsio/specmatic
+  # LAB: Response Templating — stub that echoes request values and does data lookups
+  specmatic-rt-stub:
+    image: specmatic/enterprise:latest
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-    command: stub contracts/openapi.yaml --port=9000
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: stub contracts/openapi.yaml --examples=contracts/response_templates/mock --port=9000
     ports:
-      - "9001:9000"
+      - "9000:9000"
+    profiles:
+      - response-template
+
+  # LAB: Response Templating — contract tests against the template stub
+  specmatic-rt-test:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: test --testBaseURL=http://specmatic-rt-stub:9000 contracts/openapi.yaml --examples=contracts/response_templates/test
+    depends_on:
+      - specmatic-rt-stub
+    profiles:
+      - response-template
+
+  # LAB: Dictionary — stub using domain-aware values from openapi_dictionary.yaml (auto-detected)
+  specmatic-dictionary-stub:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: stub contracts/openapi.yaml --examples=contracts/openapi_examples --port=9000
+    ports:
+      - "9000:9000"
+    profiles:
+      - dictionary
+
+  # LAB: Dictionary — contract tests against the dictionary stub
+  specmatic-dictionary-test:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: test --testBaseURL=http://specmatic-dictionary-stub:9000 contracts/openapi.yaml
+    depends_on:
+      - specmatic-dictionary-stub
+    profiles:
+      - dictionary
+
+  # ALL LABS — Specmatic Studio: visual UI at http://localhost:9000/_specmatic/studio
+  studio:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: studio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
     profiles:
       - studio
 

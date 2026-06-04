@@ -1,0 +1,27 @@
+{
+  "http-request": {
+    "method": "POST",
+    "path": "/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "testuser1",
+      "password": "testpass1"
+    }
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "user": {
+        "_id": "$match(exact:64abc123def456)",
+        "username": "$match(exact:testuser1)",
+        "email": "$match(exact:testuser1@gmail.com)",
+        "balance": "$match(dataType:number)"
+      }
+    }
+  }
+}

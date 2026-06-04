@@ -1,0 +1,28 @@
+{
+  "http-request": {
+    "method": "POST",
+    "path": "/auth/signup",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "priya123",
+      "email": "priya300504@gmail.com",
+      "password": "securepass1"
+    }
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "user": {
+        "_id": "$match(dataType:string)",
+        "username": "$match(exact:priya123)",
+        "email": "$match(exact:priya300504@gmail.com)",
+        "balance": "$match(dataType:number)"
+      }
+    }
+  }
+}

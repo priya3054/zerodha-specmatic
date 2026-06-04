@@ -1,0 +1,32 @@
+{
+  "http-request": {
+    "method": "POST",
+    "path": "/newOrder",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "name": "(STOCK:string)",
+      "qty": "(QTY:number)",
+      "price": "(PRICE:number)",
+      "mode": "BUY"
+    }
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "message": "$(dataLookup.stocks[STOCK].msg)"
+    }
+  },
+  "dataLookup": {
+    "stocks": {
+      "HDFC":     { "msg": "HDFC order added to portfolio" },
+      "INFY":     { "msg": "INFY order added to portfolio" },
+      "RELIANCE": { "msg": "RELIANCE order added to portfolio" },
+      "TCS":      { "msg": "TCS order added to portfolio" }
+    }
+  }
+}
