@@ -26,7 +26,7 @@ paths:
               properties:
                 username:
                   type: string
-                  pattern: '^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$'
+                  pattern: '^[A-Za-z\d]{6,}$'
                   example: priya123
                 email:
                   type: string

@@ -336,13 +336,30 @@ services:
       - ci
 
   # LAB: CI — Backward compatibility check: compares current branch contracts against main
+  # Uses a temp git repo (no remote) to avoid JGit hanging on GitHub auth
   specmatic-backward-compat:
     image: specmatic/enterprise:latest
-    working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
       - ../license.txt:/specmatic/specmatic-license.txt:ro
-    command: backward-compatibility-check --base-branch=main
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        rm -rf /tmp/compat-check
+        mkdir -p /tmp/compat-check/contracts
+        cd /tmp/compat-check
+        git init -q
+        git checkout -q -b main
+        git config user.email ci@ci.local
+        git config user.name CI
+        git -C /usr/src/app show main:contracts/openapi.yaml > contracts/openapi.yaml
+        git add contracts/openapi.yaml
+        git commit -q -m "baseline"
+        git checkout -q -b feature/breaking-qty-change
+        sed 's/\r$//' /usr/src/app/contracts/openapi.yaml > contracts/openapi.yaml
+        git add contracts/openapi.yaml
+        git commit -q -m "current"
+        specmatic backward-compatibility-check --base-branch=main --target-path=contracts/openapi.yaml
     profiles:
       - ci
 
