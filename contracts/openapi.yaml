@@ -26,6 +26,7 @@ paths:
               properties:
                 username:
                   type: string
+                  pattern: '^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$'
                   example: priya123
                 email:
                   type: string
@@ -33,12 +34,6 @@ paths:
                 password:
                   type: string
                   example: password123
-            examples:
-              SIGNUP_SUCCESS:
-                value:
-                  username: testuser1
-                  email: testuser1@gmail.com
-                  password: testpass1
       responses:
         '200':
           description: User registered and logged in
@@ -46,14 +41,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
-              examples:
-                SIGNUP_SUCCESS:
-                  value:
-                    user:
-                      _id: 64abc123def456
-                      username: testuser1
-                      email: testuser1@gmail.com
-                      balance: 0
         '400':
           description: Validation error or username taken
           content:
