@@ -33,13 +33,16 @@ if (!usernameRegex.test(req.body.username)) {
   }
 });
 
-router.post(
-  "/login",
-  passport.authenticate("local"),
-  (req, res) => {
-    res.json({ user: req.user });
-  }
-);
+router.post("/login", (req, res, next) => {
+  passport.authenticate("local", (err, user) => {
+    if (err) return next(err);
+    if (!user) return res.status(401).json({ error: "Password or username is incorrect" });
+    req.login(user, (loginErr) => {
+      if (loginErr) return next(loginErr);
+      res.json({ user: req.user });
+    });
+  })(req, res, next);
+});
 
 router.post("/logout", (req, res) => {
   req.logout(() => {

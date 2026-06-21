@@ -2,6 +2,8 @@ import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:3002";
+
 const usernameRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
 
 const Signup = () => {
@@ -36,7 +38,7 @@ const Signup = () => {
     const timer = setTimeout(async () => {
       try {
         const res = await fetch(
-          `http://localhost:3002/auth/check-username?username=${form.username}`
+          `${API_BASE}/auth/check-username?username=${form.username}`
         );
         const data = await res.json();
 
@@ -59,7 +61,7 @@ const Signup = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:3002/auth/signup", {
+      const res = await fetch(`${API_BASE}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

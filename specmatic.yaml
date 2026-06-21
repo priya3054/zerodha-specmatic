@@ -61,5 +61,5 @@ dependencies:
 specmatic:
   settings:
     test:
-      strictMode: true
-      schemaResiliencyTests: none
+      # strictMode: true
+      schemaResiliencyTests: all

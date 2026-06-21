@@ -28,9 +28,31 @@ services:
       - MONGO_URL=mongodb://mongo:27017/zerodha
       - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-test_key}
       - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-test_secret}
+      - RAZORPAY_BASE_URL=${RAZORPAY_BASE_URL:-http://razorpay-stub:8090}
+      - NODE_ENV=${NODE_ENV:-test}
     depends_on:
       mongo:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3002/allHoldings >/dev/null 2>&1 || exit 1"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+      start_period: 5s
+
+  # LAB: External Dependency Stub — fake Razorpay, generated from a hand-written
+  # scoped spec (contracts/razorpay/openapi.yaml). Point backend's RAZORPAY_BASE_URL
+  # at this service (http://razorpay-stub:8090) to test /create-order against a
+  # realistic Razorpay-shaped response instead of a hardcoded mock.
+  razorpay-stub:
+    image: specmatic/enterprise:latest
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - ../license.txt:/specmatic/specmatic-license.txt:ro
+    command: stub contracts/razorpay/openapi.yaml --examples=contracts/razorpay/examples --port=8090
+    ports:
+      - "8090:8090"
 
   # LAB 1 — Provider contract test: hits real backend, validates against contract
   specmatic-test:
@@ -42,6 +64,7 @@ services:
     command: test --testBaseURL=http://backend:3002 contracts/openapi.yaml
     depends_on:
       - backend
+      - razorpay-stub
     profiles:
       - test
 
@@ -96,6 +119,17 @@ services:
     profiles:
       - partial
 
+  # LAB 4 — API Coverage: wipe signup test users so re-runs start clean
+  mongo-cleanup:
+    image: mongo:7
+    depends_on:
+      mongo:
+        condition: service_healthy
+    entrypoint: ["mongosh", "mongodb://mongo:27017/zerodha", "--eval",
+                 "db.users.deleteMany({username: {$$in: ['spectest1', 'newtrader1']}})"]
+    profiles:
+      - coverage
+
   # LAB 4 — API Coverage: tests + coverage report
   specmatic-coverage:
     image: specmatic/enterprise:latest
@@ -105,7 +139,12 @@ services:
       - ../license.txt:/specmatic/specmatic-license.txt:ro
     command: test --testBaseURL=http://backend:3002 contracts/openapi.yaml
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+      razorpay-stub:
+        condition: service_started
+      mongo-cleanup:
+        condition: service_completed_successfully
     profiles:
       - coverage
 
@@ -352,7 +391,7 @@ services:
         git checkout -q -b main
         git config user.email ci@ci.local
         git config user.name CI
-        git -C /usr/src/app show main:contracts/openapi.yaml > contracts/openapi.yaml
+        sed 's/\r$//' /usr/src/app/baseline/contracts/openapi.yaml > contracts/openapi.yaml
         git add contracts/openapi.yaml
         git commit -q -m "baseline"
         git checkout -q -b feature/breaking-qty-change

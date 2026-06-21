@@ -2,6 +2,8 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:3002";
+
 const Login = () => {
   const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:3002/auth/login", {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

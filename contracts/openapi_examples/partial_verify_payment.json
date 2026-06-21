@@ -1,24 +1,26 @@
 {
-  "partial": {
-    "http-request": {
-      "method": "POST",
-      "path": "/verify-payment",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "razorpay_order_id": "order_test123",
-        "amount": 50000
-      }
+  "http-request": {
+    "method": "POST",
+    "path": "/verify-payment",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Test-Username": "spectest1"
     },
-    "http-response": {
-      "status": 200,
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": {
-        "status": "success"
-      }
+    "body": {
+      "razorpay_order_id": "order_test123",
+      "razorpay_payment_id": "pay_test456",
+      "razorpay_signature": "80c5e4f6be6e2acc8efac61036a58f99b47ead0f6b93feff0ca5cfd41054f0f0",
+      "amount": 50000
+    }
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "status": "success",
+      "balance": 50000
     }
   }
 }

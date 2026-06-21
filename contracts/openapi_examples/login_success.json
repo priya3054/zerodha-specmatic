@@ -6,8 +6,8 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "username": "testuser1",
-      "password": "testpass1"
+      "username": "spectest1",
+      "password": "spectest1"
     }
   },
   "http-response": {
@@ -18,8 +18,8 @@
     "body": {
       "user": {
         "_id": "64abc123def456",
-        "username": "testuser1",
-        "email": "testuser1@gmail.com",
+        "username": "spectest1",
+        "email": "spectest1@test.com",
         "balance": 0
       }
     }

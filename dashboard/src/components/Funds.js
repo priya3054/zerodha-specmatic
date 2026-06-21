@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import SocketContext from "../context/SocketContext";
 import { BorderAll } from "@mui/icons-material"; 
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:3002";
+
 const Funds = () => {
   const socket = useContext(SocketContext);
   const [balance, setBalance] = useState(0);
@@ -26,7 +28,7 @@ const Funds = () => {
     }
 
     try {
-      const orderRes = await fetch("http://localhost:3002/create-order", {
+      const orderRes = await fetch(`${API_BASE}/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -45,7 +47,7 @@ const Funds = () => {
 
         handler: async function (response) {
           const verifyRes = await fetch(
-            "http://localhost:3002/verify-payment",
+            `${API_BASE}/verify-payment`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },

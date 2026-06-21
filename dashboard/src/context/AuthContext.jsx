@@ -1,5 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:3002";
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -7,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:3002/auth/me", {
+    fetch(`${API_BASE}/auth/me`, {
       credentials: "include",
     })
       .then((res) => res.json())
@@ -19,7 +21,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch("http://localhost:3002/auth/logout", {
+      await fetch(`${API_BASE}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });

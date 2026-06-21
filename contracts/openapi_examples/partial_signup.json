@@ -7,8 +7,8 @@
         "Content-Type": "application/json"
       },
       "body": {
-        "username": "newtrader",
-        "email": "newtrader@gmail.com"
+        "username": "newtrader1",
+        "email": "newtrader1@gmail.com"
       }
     },
     "http-response": {
@@ -18,8 +18,8 @@
       },
       "body": {
         "user": {
-          "username": "newtrader",
-          "email": "newtrader@gmail.com"
+          "username": "newtrader1",
+          "email": "newtrader1@gmail.com"
         }
       }
     }
