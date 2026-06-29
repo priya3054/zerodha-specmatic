@@ -1,0 +1,166 @@
+openapi: 3.0.0
+
+info:
+  title: Razorpay Orders API (scoped)
+  version: 1.0.0
+  description: >
+    Hand-written subset of Razorpay's real Orders API, scoped to what this
+    project's /create-order flow uses. Field names, types and the error
+    envelope are taken from https://razorpay.com/docs/api/orders/create/
+    and https://razorpay.com/docs/api/orders/entity/ — this is not an
+    official Razorpay artifact, Razorpay does not publish a machine-readable
+    spec of their own.
+
+servers:
+  - url: https://api.razorpay.com
+
+paths:
+
+  /v1/orders:
+    post:
+      summary: Create an order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - currency
+              properties:
+                amount:
+                  type: integer
+                  description: Amount in the smallest currency sub-unit (e.g. paise for INR).
+                  example: 50000
+                currency:
+                  type: string
+                  description: ISO currency code.
+                  example: INR
+                receipt:
+                  type: string
+                  description: Internal reference, max 40 characters, must be unique.
+                  example: "receipt#1"
+                notes:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  example:
+                    key1: value1
+      responses:
+        '200':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - entity
+                  - amount
+                  - amount_paid
+                  - amount_due
+                  - currency
+                  - status
+                  - attempts
+                  - created_at
+                properties:
+                  id:
+                    type: string
+                    example: order_DaZlswtdcn9UNV
+                  entity:
+                    type: string
+                    enum: [order]
+                  amount:
+                    type: integer
+                    example: 50000
+                  amount_paid:
+                    type: integer
+                    example: 0
+                  amount_due:
+                    type: integer
+                    example: 50000
+                  currency:
+                    type: string
+                    example: INR
+                  receipt:
+                    type: string
+                    example: "receipt#1"
+                  status:
+                    type: string
+                    enum: [created, attempted, paid]
+                  attempts:
+                    type: integer
+                    example: 0
+                  notes:
+                    type: object
+                    additionalProperties:
+                      type: string
+                  created_at:
+                    type: integer
+                    example: 1572502745
+                  offer_id:
+                    type: string
+                    nullable: true
+                    example: null
+        '400':
+          description: Validation error (e.g. missing/invalid amount, unsupported currency, duplicate receipt)
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: object
+                    required:
+                      - code
+                      - description
+                    properties:
+                      code:
+                        type: string
+                        example: BAD_REQUEST_ERROR
+                      description:
+                        type: string
+                        example: The amount must be at least INR 1.00
+                      field:
+                        type: string
+                        nullable: true
+                        example: amount
+                      source:
+                        type: string
+                        nullable: true
+                        example: business
+                      step:
+                        type: string
+                        nullable: true
+                        example: null
+                      reason:
+                        type: string
+                        nullable: true
+                        example: input_validation_failed
+                      metadata:
+                        type: object
+                        additionalProperties: true
+        '500':
+          description: Internal error on Razorpay's side
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: object
+                    required:
+                      - code
+                      - description
+                    properties:
+                      code:
+                        type: string
+                        example: SERVER_ERROR
+                      description:
+                        type: string
+                        example: Internal server error occurred

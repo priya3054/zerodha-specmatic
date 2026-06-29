@@ -1,0 +1,66 @@
+name: Provider CI (Backend Contract Tests)
+
+# LAB: Continuous Integration — Gate 2: Provider pipeline
+# Tests the real Zerodha Express backend against the contract.
+# Catches backend regressions before they hit shared environments.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  provider-contract-tests:
+    runs-on: ubuntu-latest
+    env:
+      PUBLISH_TO_INSIGHTS: ${{ github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Write specmatic license key to file
+        run: |
+          echo "${{ secrets.SPECMATIC_LICENSE_KEY }}" > /tmp/specmatic-license.txt
+
+      - name: Start MongoDB
+        run: |
+          docker run -d --name mongo \
+            -p 27017:27017 \
+            mongo:7
+
+      - name: Start Zerodha backend
+        run: |
+          cd backend
+          npm install
+          PORT=3002 MONGO_URL=mongodb://localhost:27017/zerodha \
+            RAZORPAY_KEY_ID=test_key RAZORPAY_KEY_SECRET=test_secret \
+            npm start &
+          sleep 15
+
+      # Run contract tests: Specmatic sends requests defined in the contract to the real backend
+      - name: Run Specmatic contract tests against backend
+        run: |
+          docker run --rm \
+            --network host \
+            -v ${{ github.workspace }}:/usr/src/app \
+            -v /tmp/specmatic-license.txt:/specmatic/specmatic-license.txt:ro \
+            specmatic/enterprise:latest \
+            test \
+            --testBaseURL=http://localhost:3002 \
+            contracts/openapi.yaml \
+            --examples=contracts/openapi_examples
+
+      # Publish to Specmatic Insights on main branch only
+      - name: Publish report to Specmatic Insights
+        if: env.PUBLISH_TO_INSIGHTS == 'true'
+        run: |
+          docker run --rm \
+            --network host \
+            -v ${{ github.workspace }}:/usr/src/app \
+            -v /tmp/specmatic-license.txt:/specmatic/specmatic-license.txt:ro \
+            specmatic/enterprise:latest \
+            send-report \
+            --metadata build_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} \
+            --branch-name ${{ github.ref_name }} \
+            --repo-name ${{ github.event.repository.name }} \
+            --repo-id ${{ github.repository_id }} \
+            --repo-url ${{ github.event.repository.html_url }}

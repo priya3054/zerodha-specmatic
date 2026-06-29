@@ -1,0 +1,12 @@
+extends: ["spectral:oas"]
+
+# LAB: Continuous Integration — Spectral linting rules for Zerodha OpenAPI contract
+# Run locally: docker compose --profile ci run --rm specmatic-lint
+# Disabled rules that don't apply to this internal project:
+rules:
+  info-contact: off
+  info-description: off
+  oas3-api-servers: off
+  operation-description: off
+  operation-operationId: off
+  operation-tags: off
