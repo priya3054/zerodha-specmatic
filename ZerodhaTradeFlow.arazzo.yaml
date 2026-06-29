@@ -1,0 +1,173 @@
+arazzo: "1.0.0"
+info:
+  title: "Arazzo Workflow"
+  version: "1.0.0"
+sourceDescriptions:
+- name: "OpenapiApi"
+  url: "./contracts/openapi.yaml"
+  type: "openapi"
+workflows:
+- workflowId: "ZerodhaTradeFlow"
+  inputs:
+    required:
+    - "createOrder"
+    - "getMe"
+    - "loginUser"
+    - "placeNewOrder"
+    - "signupUser"
+    - "verifyPayment"
+    type: "object"
+    properties:
+      getMe:
+        required:
+        - "X-Test-Username"
+        type: "object"
+        properties:
+          X-Test-Username:
+            type: "string"
+      verifyPayment:
+        required:
+        - "razorpay_order_id"
+        - "razorpay_payment_id"
+        - "razorpay_signature"
+        type: "object"
+        properties:
+          razorpay_order_id:
+            type: "string"
+          razorpay_payment_id:
+            type: "string"
+          razorpay_signature:
+            type: "string"
+      createOrder:
+        required:
+        - "amount"
+        type: "object"
+        properties:
+          amount:
+            type: "number"
+      placeNewOrder:
+        required:
+        - "name"
+        - "qty"
+        - "price"
+        - "mode"
+        type: "object"
+        properties:
+          name:
+            type: "string"
+          qty:
+            type: "integer"
+            minimum: 1
+          price:
+            type: "number"
+          mode:
+            type: "string"
+            enum:
+            - "BUY"
+            - "SELL"
+      loginUser:
+        required:
+        - "password"
+        type: "object"
+        properties:
+          password:
+            type: "string"
+      signupUser:
+        required:
+        - "email"
+        - "password"
+        - "username"
+        type: "object"
+        properties:
+          username:
+            pattern: "^[A-Za-z\\d]{6,}$"
+            type: "string"
+          email:
+            type: "string"
+          password:
+            type: "string"
+  steps:
+  - stepId: "signupUser"
+    operationId: "$sourceDescriptions.OpenapiApi.signupUser"
+    requestBody:
+      contentType: "application/json"
+      payload:
+        username: "$inputs.signupUser.username"
+        email: "$inputs.signupUser.email"
+        password: "$inputs.signupUser.password"
+    successCriteria:
+    - condition: "$statusCode == 200"
+  - stepId: "checkUsername"
+    operationId: "$sourceDescriptions.OpenapiApi.checkUsername"
+    parameters:
+    - name: "username"
+      in: "query"
+      value: "$inputs.signupUser.username"
+    successCriteria:
+    - condition: "$statusCode == 200"
+  - stepId: "loginUser"
+    operationId: "$sourceDescriptions.OpenapiApi.loginUser"
+    requestBody:
+      contentType: "application/json"
+      payload:
+        username: "$inputs.signupUser.username"
+        password: "$inputs.signupUser.password"
+    successCriteria:
+    - condition: "$statusCode == 200"
+  - stepId: "getMe"
+    operationId: "$sourceDescriptions.OpenapiApi.getMe"
+    parameters:
+    - name: "X-Test-Username"
+      in: "header"
+      value: "$inputs.getMe.X-Test-Username"
+    successCriteria:
+    - condition: "$statusCode == 200"
+  - stepId: "getAllHoldings"
+    operationId: "$sourceDescriptions.OpenapiApi.getAllHoldings"
+    successCriteria:
+    - condition: "$statusCode == 200"
+  - stepId: "getAllPositions"
+    operationId: "$sourceDescriptions.OpenapiApi.getAllPositions"
+    successCriteria:
+    - condition: "$statusCode == 200"
+  - stepId: "placeNewOrder"
+    operationId: "$sourceDescriptions.OpenapiApi.placeNewOrder"
+    requestBody:
+      contentType: "application/json"
+      payload:
+        name: "$inputs.placeNewOrder.name"
+        qty: "$inputs.placeNewOrder.qty"
+        price: "$inputs.placeNewOrder.price"
+        mode: "$inputs.placeNewOrder.mode"
+    successCriteria:
+    - condition: "$statusCode == 200"
+  - stepId: "createOrder"
+    operationId: "$sourceDescriptions.OpenapiApi.createOrder"
+    requestBody:
+      contentType: "application/json"
+      payload:
+        amount: "$inputs.createOrder.amount"
+    successCriteria:
+    - condition: "$statusCode == 200"
+    outputs:
+      amount: "$response.body#/amount"
+  - stepId: "verifyPayment"
+    operationId: "$sourceDescriptions.OpenapiApi.verifyPayment"
+    parameters:
+    - name: "X-Test-Username"
+      in: "header"
+      value: "$inputs.getMe.X-Test-Username"
+    requestBody:
+      contentType: "application/json"
+      payload:
+        razorpay_order_id: "$inputs.verifyPayment.razorpay_order_id"
+        razorpay_payment_id: "$inputs.verifyPayment.razorpay_payment_id"
+        razorpay_signature: "$inputs.verifyPayment.razorpay_signature"
+        amount: "$steps.createOrder.outputs.amount"
+    successCriteria:
+    - condition: "$statusCode == 200"
+  - stepId: "logoutUser"
+    operationId: "$sourceDescriptions.OpenapiApi.logoutUser"
+    successCriteria:
+    - condition: "$statusCode == 200"
+components: {}

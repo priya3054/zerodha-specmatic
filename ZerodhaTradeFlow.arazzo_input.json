@@ -1,0 +1,31 @@
+{
+    "ZerodhaTradeFlow": {
+        "DEFAULT": {
+            "getMe": {
+                "X-Test-Username": "trader1"
+            },
+            "verifyPayment": {
+                "razorpay_order_id": "order_test123",
+                "razorpay_payment_id": "pay_test456",
+                "razorpay_signature": "80c5e4f6be6e2acc8efac61036a58f99b47ead0f6b93feff0ca5cfd41054f0f0"
+            },
+            "createOrder": {
+                "amount": 601
+            },
+            "placeNewOrder": {
+                "name": "INFY",
+                "qty": 5,
+                "price": 1555.45,
+                "mode": "BUY"
+            },
+            "loginUser": {
+                "password": "trader1pass"
+            },
+            "signupUser": {
+                "username": "trader1",
+                "email": "trader1@zerodha.test",
+                "password": "trader1pass"
+            }
+        }
+    }
+}
