@@ -1,0 +1,18 @@
+{
+    "http-request": {
+        "path": "/auth/logout",
+        "method": "POST",
+        "description": "This is an example of a request to create a new entity at the /auth/logout endpoint "
+    },
+    "http-response": {
+        "status": 200,
+        "body": {
+            "message": "Order saved!"
+        },
+        "status-text": "OK",
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "description": "This is an example of a response after creating a new entity at the /auth/logout endpoint "
+    }
+}

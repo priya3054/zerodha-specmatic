@@ -1,0 +1,23 @@
+{
+  "http-request": {
+    "method": "GET",
+    "path": "/auth/me",
+    "headers": {
+      "X-Test-Username": "spectest2"
+    }
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "user": {
+        "_id": "64abc123def456",
+        "username": "spectest2",
+        "email": "spectest2@spectest.local",
+        "balance": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "http-request": {
+    "method": "POST",
+    "path": "/create-order",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "amount": 5000
+    }
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "id": "order_test123",
+      "entity": "order",
+      "amount": 500000,
+      "amount_paid": 0,
+      "amount_due": 500000,
+      "currency": "INR",
+      "receipt": "funds_1234567890",
+      "status": "created"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "http-request": {
+    "method": "POST",
+    "path": "/verify-payment",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "razorpay_order_id": "order_test123",
+      "razorpay_payment_id": "pay_test456",
+      "razorpay_signature": "invalid_sig",
+      "amount": 5000
+    }
+  },
+  "http-response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "status": "failure"
+    }
+  }
+}

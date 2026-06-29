@@ -1,0 +1,28 @@
+{
+  "http-request": {
+    "method": "POST",
+    "path": "/auth/signup",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "spectest1",
+      "email": "spectest1@test.com",
+      "password": "spectest1"
+    }
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "user": {
+        "_id": "64abc123def456",
+        "username": "spectest1",
+        "email": "spectest1@test.com",
+        "balance": 0
+      }
+    }
+  }
+}
