@@ -10,12 +10,12 @@
     }
   },
   "http-response": {
-    "status": 500,
+    "status": 400,
     "headers": {
       "Content-Type": "application/json"
     },
     "body": {
-      "error": "Order creation failed"
+      "error": "amount must be greater than 0"
     }
   }
 }

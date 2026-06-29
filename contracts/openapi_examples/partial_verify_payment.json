@@ -4,7 +4,7 @@
     "path": "/verify-payment",
     "headers": {
       "Content-Type": "application/json",
-      "X-Test-Username": "spectest1"
+      "X-Test-Username": "spectest2"
     },
     "body": {
       "razorpay_order_id": "order_test123",

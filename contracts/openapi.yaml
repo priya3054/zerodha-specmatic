@@ -6,12 +6,14 @@ info:
   description: API contracts for Zerodha Clone application
 
 servers:
+  - url: http://backend:3002
   - url: http://localhost:3002
 
 paths:
 
   /auth/signup:
     post:
+      operationId: signupUser
       summary: Register a new user
       requestBody:
         required: true
@@ -50,6 +52,7 @@ paths:
 
   /auth/login:
     post:
+      operationId: loginUser
       summary: Login with username and password
       requestBody:
         required: true
@@ -83,6 +86,7 @@ paths:
 
   /auth/logout:
     post:
+      operationId: logoutUser
       summary: Logout current user
       responses:
         '200':
@@ -98,13 +102,10 @@ paths:
 
   /auth/me:
     get:
+      operationId: getMe
       summary: Get currently logged-in user
-      parameters:
-        - in: header
-          name: X-Test-Username
-          required: false
-          schema:
-            type: string
+      security:
+        - testAuth: []
       responses:
         '200':
           description: Current user details
@@ -126,6 +127,7 @@ paths:
 
   /auth/check-username:
     get:
+      operationId: checkUsername
       summary: Check if a username is available
       parameters:
         - in: query
@@ -145,9 +147,20 @@ paths:
                   available:
                     type: boolean
                     example: true
+        '400':
+          description: Missing username query parameter
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+                    example: false
 
   /allHoldings:
     get:
+      operationId: getAllHoldings
       summary: Get all stock holdings
       responses:
         '200':
@@ -161,6 +174,7 @@ paths:
 
   /allPositions:
     get:
+      operationId: getAllPositions
       summary: Get all trading positions
       responses:
         '200':
@@ -174,6 +188,7 @@ paths:
 
   /newOrder:
     post:
+      operationId: placeNewOrder
       summary: Place a new stock order
       requestBody:
         required: true
@@ -191,7 +206,8 @@ paths:
                   type: string
                   example: INFY
                 qty:
-                  type: number
+                  type: integer
+                  minimum: 1
                   example: 5
                 price:
                   type: number
@@ -213,9 +229,16 @@ paths:
                   message:
                     type: string
                     example: Order saved!
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /create-order:
     post:
+      operationId: createOrder
       summary: Create a Razorpay payment order for adding funds
       requestBody:
         required: true
@@ -236,6 +259,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RazorpayOrder'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '500':
           description: Order creation failed
           content:
@@ -245,13 +274,10 @@ paths:
 
   /verify-payment:
     post:
+      operationId: verifyPayment
       summary: Verify Razorpay payment and credit funds to user balance
-      parameters:
-        - in: header
-          name: X-Test-Username
-          required: false
-          schema:
-            type: string
+      security:
+        - testAuth: []
       requestBody:
         required: true
         content:
@@ -308,6 +334,13 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
 components:
+  securitySchemes:
+    testAuth:
+      type: apiKey
+      in: header
+      name: X-Test-Username
+      description: Test-only header that identifies the acting user; backend resolves it to a session in non-production environments.
+
   schemas:
 
     User:
@@ -363,6 +396,10 @@ components:
 
     Position:
       type: object
+      required:
+        - name
+        - qty
+        - price
       properties:
         _id:
           type: string
@@ -394,6 +431,9 @@ components:
 
     RazorpayOrder:
       type: object
+      required:
+        - id
+        - amount
       properties:
         id:
           type: string
@@ -419,6 +459,20 @@ components:
         status:
           type: string
           example: created
+        attempts:
+          type: number
+          example: 0
+        notes:
+          type: object
+          additionalProperties:
+            type: string
+        created_at:
+          type: number
+          example: 1716000000
+        offer_id:
+          type: string
+          nullable: true
+          example: null
 
     ErrorResponse:
       type: object

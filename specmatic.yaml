@@ -10,7 +10,9 @@ systemUnderTest:
             filesystem:
               directory: contracts
           specs:
-            - openapi.yaml
+            - spec:
+                id: zerodhaApiSpec
+                path: openapi.yaml
     runOptions:
       openapi:
         type: test
@@ -23,6 +25,13 @@ systemUnderTest:
           ids:
             "POST /create-order -> 200":
               extract: "BODY.id"
+        specs:
+          - spec:
+              id: zerodhaApiSpec
+              securitySchemes:
+                testAuth:
+                  type: apiKey
+                  token: spectest2
     data:
       examples:
         - directories:
@@ -63,3 +72,4 @@ specmatic:
     test:
       # strictMode: true
       schemaResiliencyTests: all
+      

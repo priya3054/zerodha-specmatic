@@ -119,17 +119,6 @@ services:
     profiles:
       - partial
 
-  # LAB 4 — API Coverage: wipe signup test users so re-runs start clean
-  mongo-cleanup:
-    image: mongo:7
-    depends_on:
-      mongo:
-        condition: service_healthy
-    entrypoint: ["mongosh", "mongodb://mongo:27017/zerodha", "--eval",
-                 "db.users.deleteMany({username: {$$in: ['spectest1', 'newtrader1']}})"]
-    profiles:
-      - coverage
-
   # LAB 4 — API Coverage: tests + coverage report
   specmatic-coverage:
     image: specmatic/enterprise:latest
@@ -143,8 +132,6 @@ services:
         condition: service_healthy
       razorpay-stub:
         condition: service_started
-      mongo-cleanup:
-        condition: service_completed_successfully
     profiles:
       - coverage
 
@@ -424,6 +411,9 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
+    depends_on:
+      backend:
+        condition: service_healthy
     profiles:
       - studio
 
