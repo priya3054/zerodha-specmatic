@@ -1,0 +1,20 @@
+version: 3
+
+# Async contract test config — runs Specmatic against the Kafka order processor.
+# Usage: docker compose --profile async up async-contract-test --abort-on-container-exit
+
+systemUnderTest:
+  service:
+    definitions:
+      - definition:
+          source:
+            filesystem:
+              directory: contracts
+          specs:
+            - asyncapi.yaml
+    runOptions:
+      asyncapi:
+        type: test
+        servers:
+          - host: kafka:9092
+            protocol: kafka

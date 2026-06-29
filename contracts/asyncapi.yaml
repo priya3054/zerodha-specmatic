@@ -1,0 +1,137 @@
+asyncapi: 3.0.0
+
+info:
+  title: Zerodha Order Events API
+  version: 1.0.0
+
+servers:
+  kafka-server:
+    host: 'kafka:9092'
+    protocol: kafka
+
+channels:
+  StockOrderPlaced:
+    address: stock-orders
+    messages:
+      placeStockOrder.message:
+        $ref: '#/components/messages/StockOrderRequest'
+
+  OrderConfirmed:
+    address: order-confirmed
+    messages:
+      confirmOrder.message:
+        $ref: '#/components/messages/OrderConfirmation'
+
+operations:
+  placeStockOrder:
+    action: receive
+    channel:
+      $ref: '#/channels/StockOrderPlaced'
+    messages:
+      - $ref: '#/channels/StockOrderPlaced/messages/placeStockOrder.message'
+    reply:
+      channel:
+        $ref: '#/channels/OrderConfirmed'
+      messages:
+        - $ref: '#/channels/OrderConfirmed/messages/confirmOrder.message'
+
+components:
+  messages:
+    StockOrderRequest:
+      name: StockOrderRequest
+      title: A stock order event
+      contentType: application/json
+      bindings:
+        kafka:
+          key:
+            type: string
+      examples:
+        - name: BuyINFYExample
+          payload:
+            orderId: "ORD-001"
+            name: INFY
+            qty: 5
+            price: 1555.45
+            mode: BUY
+          headers:
+            traceId: "trace-001"
+      headers:
+        type: object
+        properties:
+          traceId:
+            type: string
+            description: Trace ID for correlation
+      payload:
+        type: object
+        required:
+          - orderId
+          - name
+          - qty
+          - price
+          - mode
+        properties:
+          orderId:
+            type: string
+          name:
+            type: string
+            description: Stock ticker symbol
+          qty:
+            type: integer
+            minimum: 1
+          price:
+            type: number
+          mode:
+            type: string
+            enum:
+              - BUY
+              - SELL
+
+    OrderConfirmation:
+      name: OrderConfirmation
+      title: Order confirmation event emitted by the processor
+      contentType: application/json
+      bindings:
+        kafka:
+          key:
+            type: string
+      examples:
+        - name: BuyINFYConfirmedExample
+          payload:
+            orderId: "ORD-001"
+            status: CONFIRMED
+            totalAmount: 7777.25
+          headers:
+            traceId: "trace-001"
+      headers:
+        type: object
+        properties:
+          traceId:
+            type: string
+            description: Trace ID echoed from the request
+      payload:
+        type: object
+        required:
+          - orderId
+          - status
+          - totalAmount
+        properties:
+          orderId:
+            type: string
+          status:
+            $ref: '#/components/messages/OrderStatus'
+          totalAmount:
+            type: number
+
+    OrderStatus:
+      name: OrderStatus
+      title: Valid order statuses
+      payload:
+        type: string
+        enum:
+          - PENDING
+          - CONFIRMED
+          - REJECTED
+
+  correlationIds:
+    traceId:
+      location: '$message.header#/traceId'
