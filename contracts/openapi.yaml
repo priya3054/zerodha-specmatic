@@ -376,7 +376,7 @@ components:
           type: string
           example: TCS
         qty:
-          type: number
+          type: integer
           example: 1
         avg:
           type: number
@@ -411,7 +411,7 @@ components:
           type: string
           example: EVEREADY
         qty:
-          type: number
+          type: integer
           example: 2
         avg:
           type: number
