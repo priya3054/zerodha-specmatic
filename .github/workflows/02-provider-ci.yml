@@ -27,12 +27,25 @@ jobs:
             -p 27017:27017 \
             mongo:7
 
+      - name: Start Razorpay stub
+        run: |
+          docker run -d --name razorpay-stub \
+            --network host \
+            -v ${{ github.workspace }}:/usr/src/app \
+            -v /tmp/specmatic-license.txt:/specmatic/specmatic-license.txt:ro \
+            specmatic/enterprise:latest \
+            stub contracts/razorpay/openapi.yaml \
+            --examples=contracts/razorpay/examples \
+            --port=8090
+
       - name: Start Zerodha backend
         run: |
           cd backend
           npm install
           PORT=3002 MONGO_URL=mongodb://localhost:27017/zerodha \
             RAZORPAY_KEY_ID=test_key RAZORPAY_KEY_SECRET=test_secret \
+            RAZORPAY_BASE_URL=http://localhost:8090 \
+            NODE_ENV=test \
             npm start &
           sleep 15
 
