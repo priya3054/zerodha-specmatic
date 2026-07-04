@@ -438,6 +438,7 @@ app.post("/newOrder", async (req, res) => {
   if (
     typeof name !== "string" ||
     typeof qty !== "number" ||
+    !Number.isInteger(qty) ||
     qty < 1 ||
     typeof price !== "number" ||
     !["BUY", "SELL"].includes(mode)
