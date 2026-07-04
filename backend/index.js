@@ -399,6 +399,10 @@ app.post("/verify-payment", async (req, res) => {
     return res.status(400).json({ status: "failure" });
   }
 
+  if (typeof amount !== "number" || Number.isNaN(amount)) {
+    return res.status(400).json({ status: "failure" });
+  }
+
   if (!req.isAuthenticated()) {
     return res.status(401).json({ error: "Login required" });
   }
