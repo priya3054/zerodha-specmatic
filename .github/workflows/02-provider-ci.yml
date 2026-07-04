@@ -32,7 +32,7 @@ jobs:
           docker run -d --name razorpay-stub \
             --network host \
             -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/specmatic/specmatic-license.txt:ro \
+            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
             specmatic/enterprise:latest \
             stub contracts/razorpay/openapi.yaml \
             --examples=contracts/razorpay/examples \
@@ -55,7 +55,7 @@ jobs:
           docker run --rm \
             --network host \
             -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/specmatic/specmatic-license.txt:ro \
+            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
             specmatic/enterprise:latest \
             test \
             --testBaseURL=http://localhost:3002 \
@@ -69,7 +69,7 @@ jobs:
           docker run --rm \
             --network host \
             -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/specmatic/specmatic-license.txt:ro \
+            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
             specmatic/enterprise:latest \
             send-report \
             --metadata build_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} \

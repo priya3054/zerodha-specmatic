@@ -11,8 +11,7 @@ const session = require("express-session");
 const crypto = require("crypto");
 const authRoutes = require("./routes/auth");
 
-const http = require("http");            
-const { Server } = require("socket.io");
+const http = require("http");
 
 const { HoldingsModel } = require("./model/HoldingsModel");
 const { PositionsModel } = require("./model/PositionsModel");
@@ -23,14 +22,6 @@ const uri = process.env.MONGO_URL;
 
 const app = express();
 const server = http.createServer(app);
-
-const io = new Server(server, {
-  cors: {
-    origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:9000"],
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
 
 const RAZORPAY_BASE_URL = process.env.RAZORPAY_BASE_URL || "https://api.razorpay.com";
 
@@ -102,8 +93,25 @@ async function getAllStockNames() {
   return Array.from(stockSet);
 }
 
-io.on("connection", (socket) => {
-  console.log("Client connected:", socket.id);
+const sseClients = new Set();
+
+function broadcastEvent(event, data) {
+  const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+  for (const client of sseClients) {
+    client.write(payload);
+  }
+}
+
+app.get("/events", (req, res) => {
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive",
+  });
+  res.flushHeaders();
+
+  sseClients.add(res);
+  console.log("SSE client connected. Total clients:", sseClients.size);
 
   if (!priceInterval) {
     console.log("Starting global live price feed...");
@@ -113,7 +121,7 @@ io.on("connection", (socket) => {
         const stocks = await getAllStockNames();
 
         stocks.forEach((stock) => {
-          io.emit("price-update", {
+          broadcastEvent("price-update", {
             name: stock,
             price: (Math.random() * 1000 + 1200).toFixed(2),
           });
@@ -121,29 +129,12 @@ io.on("connection", (socket) => {
       } catch (err) {
         console.error("Price update error:", err);
       }
-    }, 2000); 
+    }, 2000);
   }
 
-  socket.on("place-order", async (orderData) => {
-    try {
-      const newOrder = new OrdersModel(orderData);
-      await newOrder.save();
-
-      io.emit("order-confirmed", {
-        status: "success",
-        order: newOrder,
-      });
-    } catch (error) {
-      console.error("Order save failed:", error);
-      socket.emit("order-confirmed", {
-        status: "error",
-        message: "Order failed",
-      });
-    }
-  });
-
-  socket.on("disconnect", () => {
-    console.log("Client disconnected:", socket.id);
+  req.on("close", () => {
+    sseClients.delete(res);
+    console.log("SSE client disconnected. Total clients:", sseClients.size);
   });
 });
 
@@ -414,7 +405,7 @@ app.post("/verify-payment", async (req, res) => {
       { new: true }
     );
 
-    io.emit("balance-update", {
+    broadcastEvent("balance-update", {
       userId: user._id,
       balance: user.balance,
     });
@@ -455,7 +446,7 @@ app.post("/newOrder", async (req, res) => {
 
     await newOrder.save();
 
-    io.emit("order-update", {
+    broadcastEvent("order-update", {
       message: "New order placed",
       order: newOrder,
     });

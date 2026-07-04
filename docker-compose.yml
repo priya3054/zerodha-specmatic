@@ -49,7 +49,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub contracts/razorpay/openapi.yaml --examples=contracts/razorpay/examples --port=8090
     ports:
       - "8090:8090"
@@ -60,7 +60,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: test --testBaseURL=http://backend:3002 contracts/openapi.yaml
     depends_on:
       - backend
@@ -74,7 +74,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub contracts/openapi.yaml --port=9000
     ports:
       - "9000:9000"
@@ -87,7 +87,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: examples validate --contract-file=contracts/openapi.yaml --examples-dir=contracts/openapi_examples
     profiles:
       - examples
@@ -99,7 +99,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub contracts/openapi.yaml --examples=contracts/openapi_examples --port=9000
     ports:
       - "9000:9000"
@@ -112,7 +112,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: test --testBaseURL=http://specmatic-partial-stub:9000 contracts/openapi.yaml
     depends_on:
       - specmatic-partial-stub
@@ -125,7 +125,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: test --testBaseURL=http://backend:3002 contracts/openapi.yaml
     depends_on:
       backend:
@@ -141,7 +141,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub contracts/openapi.yaml --examples=contracts/response_templates/mock --port=9000
     ports:
       - "9000:9000"
@@ -154,7 +154,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: test --testBaseURL=http://specmatic-rt-stub:9000 contracts/openapi.yaml --examples=contracts/response_templates/test
     depends_on:
       - specmatic-rt-stub
@@ -167,7 +167,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub contracts/openapi.yaml --examples=contracts/openapi_examples --port=9000
     ports:
       - "9000:9000"
@@ -180,7 +180,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: test --testBaseURL=http://specmatic-dictionary-stub:9000 contracts/openapi.yaml
     depends_on:
       - specmatic-dictionary-stub
@@ -193,7 +193,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub contracts/openapi.yaml --examples=contracts/openapi_examples --port=9000
     ports:
       - "9000:9000"
@@ -208,7 +208,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: ["test", "--testBaseURL=http://specmatic-filter-stub:9000", "contracts/openapi.yaml", "--filter", "STATUS='200'"]
     depends_on:
       - specmatic-filter-stub
@@ -221,7 +221,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: ["test", "--testBaseURL=http://specmatic-filter-stub:9000", "contracts/openapi.yaml", "--filter", "METHOD='POST'"]
     depends_on:
       - specmatic-filter-stub
@@ -234,7 +234,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: ["test", "--testBaseURL=http://specmatic-filter-stub:9000", "contracts/openapi.yaml", "--filter", "PATH='/auth/signup' || PATH='/auth/login'"]
     depends_on:
       - specmatic-filter-stub
@@ -247,7 +247,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: ["mock"]
     ports:
       - "8080:8080"
@@ -284,7 +284,7 @@ services:
     working_dir: /tmp
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub /usr/src/app/contracts/openapi.yaml --port=8081
     ports:
       - "8081:8081"
@@ -321,7 +321,7 @@ services:
     working_dir: /tmp
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub /usr/src/app/contracts/openapi.yaml --examples=/usr/src/app/contracts/openapi_examples --port=9000
     ports:
       - "9000:9000"
@@ -340,7 +340,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: ["test", "--testBaseURL=http://specmatic-workflow-stub:9000",
               "contracts/openapi.yaml",
               "--examples=contracts/openapi_examples",
@@ -367,7 +367,7 @@ services:
     image: specmatic/enterprise:latest
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     entrypoint: ["sh", "-c"]
     command:
       - |
@@ -395,7 +395,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: run-suite
     profiles:
       - suite
@@ -406,7 +406,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: studio
     ports:
       - "9000:9000"
@@ -488,7 +488,7 @@ services:
     working_dir: /usr/src/app/async
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/specmatic/specmatic-license.txt:ro
+      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     depends_on:
       kafka-init:
         condition: service_completed_successfully

@@ -1,37 +1,32 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import GeneralContext from "./GeneralContext";
 import "./BuyActionWindow.css";
-import SocketContext from "../context/SocketContext";
+
+const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:3002";
 
 const BuyActionWindow = ({ uid }) => {
   const [stockQuantity, setStockQuantity] = useState(1);
   const [stockPrice, setStockPrice] = useState(0.0);
 
   const { closeBuyWindow } = useContext(GeneralContext);
-  const socket = useContext(SocketContext);
 
-  const handleBuyClick = () => {
-    socket.emit("place-order", {
-      name: uid,
-      qty: stockQuantity,
-      price: stockPrice,
-      mode: "BUY",
+  const handleBuyClick = async () => {
+    const res = await fetch(`${API_BASE}/newOrder`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        name: uid,
+        qty: Number(stockQuantity),
+        price: Number(stockPrice),
+        mode: "BUY",
+      }),
     });
+
+    if (res.ok) {
+      closeBuyWindow();
+    }
   };
-
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleOrderConfirmed = (data) => {
-      if (data.status === "success") {
-        closeBuyWindow();
-      }
-    };
-
-    socket.on("order-confirmed", handleOrderConfirmed);
-
-    return () => socket.off("order-confirmed", handleOrderConfirmed);
-  }, [socket, closeBuyWindow]);
 
   return (
     <div className="container" id="buy-window" draggable="true">

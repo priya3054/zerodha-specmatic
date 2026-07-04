@@ -5,6 +5,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./components/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { GeneralContextProvider } from "./components/GeneralContext";
+import { SseProvider } from "./context/SseContext";
 
 const App = () => {
   return (
@@ -17,9 +18,11 @@ const App = () => {
           path="/dashboard/*"
           element={
             <ProtectedRoute>
-              <GeneralContextProvider>
-                <Dashboard />
-              </GeneralContextProvider>
+              <SseProvider>
+                <GeneralContextProvider>
+                  <Dashboard />
+                </GeneralContextProvider>
+              </SseProvider>
             </ProtectedRoute>
           }
         />

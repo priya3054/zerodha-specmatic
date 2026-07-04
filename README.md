@@ -4,7 +4,7 @@
 ![NodeJS](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js)
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb)
 ![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express)
-![Socket.IO](https://img.shields.io/badge/Socket.IO-010101?style=for-the-badge&logo=socketdotio)
+![SSE](https://img.shields.io/badge/Server--Sent%20Events-010101?style=for-the-badge&logo=htmx)
 ![Razorpay](https://img.shields.io/badge/Razorpay-0C2451?style=for-the-badge&logo=razorpay)
 
 A full-stack real-time trading dashboard inspired by Zerodha, built using the MERN stack.
@@ -12,7 +12,7 @@ A full-stack real-time trading dashboard inspired by Zerodha, built using the ME
 This project simulates the core functionalities of a modern stock trading platform including:
 
 - 🔐 Authentication & Session Management
-- ⚡ Real-Time Stock Updates using Socket.IO
+- ⚡ Real-Time Stock Updates using Server-Sent Events (SSE)
 - 💳 Razorpay Payment Gateway Integration
 - 📈 Portfolio & Holdings Management
 - 📊 Interactive Chart Visualizations
@@ -33,11 +33,11 @@ This project simulates the core functionalities of a modern stock trading platfo
 ---
 
 ## ⚡ Real-Time Watchlist
-- Live stock price updates using Socket.IO
+- Live stock price updates using Server-Sent Events (SSE)
 - Event-driven architecture
 - Dynamic watchlist rendering
 - Real-time chart updates
-- Shared socket connection using Context API
+- Shared EventSource connection using Context API
 
 ---
 
@@ -76,7 +76,7 @@ A[React Frontend] --> B[Express Backend]
 
 B --> C[MongoDB]
 B --> D[Razorpay API]
-B --> E[Socket.IO Server]
+B --> E[SSE Endpoint /events]
 
 E --> A
 ```
@@ -113,9 +113,9 @@ Frontend-->>User: Login Successful
 ```mermaid
 flowchart LR
 
-A[Backend Emits Prices] --> B[Socket.IO]
+A[Backend Emits Prices] --> B[SSE /events Stream]
 
-B --> C[Frontend Listener]
+B --> C[Frontend EventSource Listener]
 
 C --> D[React State Update]
 
@@ -160,7 +160,7 @@ Backend->>MongoDB: Update User Balance
 
 Backend-->>Frontend: Payment Success
 
-Backend->>Frontend: Emit balance-update via Socket.IO
+Backend->>Frontend: Push balance-update via SSE
 ```
 
 ---
@@ -207,7 +207,7 @@ ZerodhaClone/
 - Node.js
 - Express.js
 - Passport.js
-- Socket.IO
+- Server-Sent Events (SSE)
 
 ---
 
@@ -303,7 +303,7 @@ Every Specmatic service in `docker-compose.yml` mounts the license from **one di
 
 ```yaml
 volumes:
-  - ../license.txt:/specmatic/specmatic-license.txt:ro
+  - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
 ```
 
 So your folder layout needs to look like:
@@ -390,7 +390,7 @@ The GitHub Actions workflows don't use `docker-compose` — they call the image 
 # Contract test against a locally running backend (http://localhost:3002)
 docker run --rm --network host \
   -v "$(pwd):/usr/src/app" \
-  -v /path/to/license.txt:/specmatic/specmatic-license.txt:ro \
+  -v /path/to/license.txt:/root/.specmatic/specmatic-license.txt:ro \
   specmatic/enterprise:latest \
   test --testBaseURL=http://localhost:3002 contracts/openapi.yaml --examples=contracts/openapi_examples
 ```
@@ -399,7 +399,7 @@ docker run --rm --network host \
 # Backward-compatibility check against the committed baseline
 docker run --rm \
   -v "$(pwd):/usr/src/app" \
-  -v /path/to/license.txt:/specmatic/specmatic-license.txt:ro \
+  -v /path/to/license.txt:/root/.specmatic/specmatic-license.txt:ro \
   --entrypoint sh specmatic/enterprise:latest -c '
     mkdir -p /tmp/compat-check/contracts && cd /tmp/compat-check
     git init -q && git checkout -q -b main
@@ -421,7 +421,7 @@ Run it against a live backend:
 
 ```bash
 docker compose up -d mongo backend razorpay-stub
-docker run --rm -v "$(pwd):/usr/src/app" -v /path/to/license.txt:/specmatic/specmatic-license.txt:ro \
+docker run --rm -v "$(pwd):/usr/src/app" -v /path/to/license.txt:/root/.specmatic/specmatic-license.txt:ro \
   specmatic/enterprise:latest test "ZerodhaTradeFlow.arazzo.yaml"
 ```
 
@@ -466,7 +466,7 @@ RAZORPAY_KEY_SECRET=your_razorpay_secret
 - REST APIs
 - Event-Driven Architecture
 - Real-Time Communication
-- Socket.IO
+- Server-Sent Events (SSE)
 - React Reconciliation
 - Context API
 - Session-Based Authentication
@@ -481,7 +481,7 @@ RAZORPAY_KEY_SECRET=your_razorpay_secret
 
 # 🚧 Future Improvements
 
-- Redis Pub/Sub for scalable Socket.IO broadcasting
+- Redis Pub/Sub for scalable SSE broadcasting across multiple backend instances
 - Webhook-based payment verification
 - Advanced analytics dashboard
 - Docker deployment

@@ -40,7 +40,7 @@ jobs:
           echo "${{ secrets.SPECMATIC_LICENSE_KEY }}" > /tmp/specmatic-license.txt
           docker run --rm \
             -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/specmatic/specmatic-license.txt:ro \
+            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
             specmatic/enterprise:latest \
             examples validate \
             --contract-file=contracts/openapi.yaml \
@@ -56,7 +56,7 @@ jobs:
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/specmatic/specmatic-license.txt:ro \
+            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
             --entrypoint sh \
             specmatic/enterprise:latest \
             -c '
@@ -83,7 +83,7 @@ jobs:
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/specmatic/specmatic-license.txt:ro \
+            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
             specmatic/enterprise:latest \
             central-contract-repo-report
 
@@ -93,7 +93,7 @@ jobs:
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/specmatic/specmatic-license.txt:ro \
+            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
             specmatic/enterprise:latest \
             send-report \
             --metadata build_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} \

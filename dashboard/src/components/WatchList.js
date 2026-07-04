@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import SocketContext from "../context/SocketContext";
+import SseContext from "../context/SseContext";
 import GeneralContext from "./GeneralContext";
 
 import { Tooltip, Grow } from "@mui/material";
@@ -16,15 +16,17 @@ import { DoughnutChart } from "./DoughnoutChart";
 /*WATCHLIST (MAIN)*/
 
 const WatchList = () => {
-  const socket = useContext(SocketContext);
+  const eventSource = useContext(SseContext);
 
   const [stocks, setStocks] = useState(initialWatchlist);
 
   /*LIVE PRICE UPDATE*/
   useEffect(() => {
-    if (!socket) return;
+    if (!eventSource) return;
 
-    const handlePriceUpdate = (data) => {
+    const handlePriceUpdate = (event) => {
+      const data = JSON.parse(event.data);
+
       setStocks((prevStocks) =>
         prevStocks.map((stock) => {
           if (stock.name !== data.name) return stock;
@@ -47,12 +49,12 @@ const WatchList = () => {
       );
     };
 
-    socket.on("price-update", handlePriceUpdate);
+    eventSource.addEventListener("price-update", handlePriceUpdate);
 
     return () => {
-      socket.off("price-update", handlePriceUpdate);
+      eventSource.removeEventListener("price-update", handlePriceUpdate);
     };
-  }, [socket]);
+  }, [eventSource]);
 
   /*CHART DATA*/
   const labels = stocks.map((stock) => stock.name);

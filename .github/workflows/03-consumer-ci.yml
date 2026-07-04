@@ -33,7 +33,7 @@ jobs:
         run: |
           docker run -d --name specmatic-stub \
             -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/specmatic/specmatic-license.txt:ro \
+            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
             -p 3002:9000 \
             specmatic/enterprise:latest \
             stub contracts/openapi.yaml \
@@ -59,7 +59,7 @@ jobs:
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/specmatic/specmatic-license.txt:ro \
+            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
             specmatic/enterprise:latest \
             send-report \
             --metadata build_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} \

@@ -1,23 +1,27 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import SocketContext from "../context/SocketContext";
+import SseContext from "../context/SseContext";
 import { BorderAll } from "@mui/icons-material"; 
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:3002";
 
 const Funds = () => {
-  const socket = useContext(SocketContext);
+  const eventSource = useContext(SseContext);
   const [balance, setBalance] = useState(0);
 
   useEffect(() => {
-    if (!socket) return;
-    socket.on("balance-update", (data) => {
+    if (!eventSource) return;
+
+    const handleBalanceUpdate = (event) => {
+      const data = JSON.parse(event.data);
       setBalance(data.balance);
-    });
-    return () => {
-      socket.off("balance-update");
     };
-  }, [socket]);
+
+    eventSource.addEventListener("balance-update", handleBalanceUpdate);
+    return () => {
+      eventSource.removeEventListener("balance-update", handleBalanceUpdate);
+    };
+  }, [eventSource]);
 
   const addFunds = async () => {
     const amount = prompt("Enter amount to add");
