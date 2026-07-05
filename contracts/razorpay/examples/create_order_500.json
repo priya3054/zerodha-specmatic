@@ -1,0 +1,26 @@
+{
+  "http-request": {
+    "method": "POST",
+    "path": "/v1/orders",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "amount": 888800,
+      "currency": "INR",
+      "receipt": "(string)"
+    }
+  },
+  "http-response": {
+    "status": 500,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "error": {
+        "code": "SERVER_ERROR",
+        "description": "Internal server error occurred"
+      }
+    }
+  }
+}

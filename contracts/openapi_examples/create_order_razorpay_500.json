@@ -1,0 +1,21 @@
+{
+  "http-request": {
+    "method": "POST",
+    "path": "/create-order",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "amount": 8888
+    }
+  },
+  "http-response": {
+    "status": 500,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "error": "Internal server error occurred"
+    }
+  }
+}

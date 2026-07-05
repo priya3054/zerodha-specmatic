@@ -1,0 +1,21 @@
+{
+  "http-request": {
+    "method": "POST",
+    "path": "/create-order",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "amount": 1
+    }
+  },
+  "http-response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "error": "The amount must be at least INR 1.00"
+    }
+  }
+}

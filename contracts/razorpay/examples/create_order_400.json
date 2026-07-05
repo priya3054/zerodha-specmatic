@@ -1,0 +1,31 @@
+{
+  "http-request": {
+    "method": "POST",
+    "path": "/v1/orders",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "amount": 100,
+      "currency": "INR",
+      "receipt": "(string)"
+    }
+  },
+  "http-response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "error": {
+        "code": "BAD_REQUEST_ERROR",
+        "description": "The amount must be at least INR 1.00",
+        "field": "amount",
+        "source": "business",
+        "step": null,
+        "reason": "input_validation_failed",
+        "metadata": {}
+      }
+    }
+  }
+}
