@@ -333,6 +333,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /events:
+    get:
+      operationId: streamEvents
+      summary: Server-Sent Events stream for live price, balance, and order updates
+      description: >
+        Long-lived SSE stream. Emits `price-update`, `balance-update`, and
+        `order-update` named events, each carrying a JSON-encoded data
+        payload. In test environments (NODE_ENV=test) the backend emits one
+        sample event and closes the connection, so contract tests get a
+        finite response to assert against instead of hanging on a stream
+        that otherwise never terminates.
+      responses:
+        '200':
+          description: SSE stream opened
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
 components:
   securitySchemes:
     testAuth:

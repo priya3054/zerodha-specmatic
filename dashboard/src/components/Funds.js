@@ -1,13 +1,20 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import SseContext from "../context/SseContext";
-import { BorderAll } from "@mui/icons-material"; 
+import AuthContext from "../context/AuthContext";
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:3002";
 
 const Funds = () => {
   const eventSource = useContext(SseContext);
+  const { user } = useContext(AuthContext);
   const [balance, setBalance] = useState(0);
+
+  useEffect(() => {
+    if (user?.balance != null) {
+      setBalance(user.balance);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!eventSource) return;
@@ -104,7 +111,7 @@ const Funds = () => {
           <div className="table">
             <div className="data">
               <p>Available margin</p>
-              <p className="imp colored">4,043.10</p>
+              <p className="imp colored">{balance.toFixed(2)}</p>
             </div>
             <div className="data">
               <p>Used margin</p>
@@ -112,7 +119,7 @@ const Funds = () => {
             </div>
             <div className="data">
               <p>Available cash</p>
-              <p className="imp">4,043.10</p>
+              <p className="imp">{balance.toFixed(2)}</p>
             </div>
             <hr />
             <div className="data">

@@ -110,6 +110,15 @@ app.get("/events", (req, res) => {
   });
   res.flushHeaders();
 
+  // Contract tests issue a normal finite HTTP request and can't assert
+  // against a connection that never closes, so under test we emit one
+  // sample event and end the response instead of holding it open forever.
+  if (process.env.NODE_ENV === "test") {
+    res.write(`event: price-update\ndata: ${JSON.stringify({ name: "TCS", price: "3194.80" })}\n\n`);
+    res.end();
+    return;
+  }
+
   sseClients.add(res);
   console.log("SSE client connected. Total clients:", sseClients.size);
 

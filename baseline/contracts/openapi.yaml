@@ -375,7 +375,7 @@ components:
           type: string
           example: TCS
         qty:
-          type: number
+          type: integer
           example: 1
         avg:
           type: number
@@ -395,6 +395,10 @@ components:
 
     Position:
       type: object
+      required:
+        - name
+        - qty
+        - price
       properties:
         _id:
           type: string
@@ -406,7 +410,7 @@ components:
           type: string
           example: EVEREADY
         qty:
-          type: number
+          type: integer
           example: 2
         avg:
           type: number
@@ -426,6 +430,9 @@ components:
 
     RazorpayOrder:
       type: object
+      required:
+        - id
+        - amount
       properties:
         id:
           type: string
