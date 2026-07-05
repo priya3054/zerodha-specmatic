@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-      PUBLISH_TO_INSIGHTS: ${{ github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,11 +36,9 @@ jobs:
       # STEP 2: Validate all examples match the contract schema
       - name: Validate examples (Specmatic)
         run: |
-          echo "${{ secrets.SPECMATIC_LICENSE_KEY }}" > /tmp/specmatic-license.txt
           docker run --rm \
             -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
-            specmatic/enterprise:latest \
+            specmatic/specmatic:2.49.1 \
             examples validate \
             --contract-file=contracts/openapi.yaml \
             --examples-dir=contracts/openapi_examples
@@ -56,9 +53,8 @@ jobs:
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
             --entrypoint sh \
-            specmatic/enterprise:latest \
+            specmatic/specmatic:2.49.1 \
             -c '
               rm -rf /tmp/compat-check
               mkdir -p /tmp/compat-check/contracts
@@ -76,28 +72,3 @@ jobs:
               git commit -q -m "current"
               specmatic backward-compatibility-check --base-branch=main --target-path=contracts/openapi.yaml
             '
-
-      # STEP 4: Generate central contract repo report (main branch only)
-      - name: Generate central contract repo report
-        if: env.PUBLISH_TO_INSIGHTS == 'true'
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
-            specmatic/enterprise:latest \
-            central-contract-repo-report
-
-      # STEP 5: Publish to Specmatic Insights (main branch only)
-      - name: Publish report to Specmatic Insights
-        if: env.PUBLISH_TO_INSIGHTS == 'true'
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
-            specmatic/enterprise:latest \
-            send-report \
-            --metadata build_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} \
-            --branch-name ${{ github.ref_name }} \
-            --repo-name ${{ github.event.repository.name }} \
-            --repo-id ${{ github.repository_id }} \
-            --repo-url ${{ github.event.repository.html_url }}

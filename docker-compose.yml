@@ -45,22 +45,20 @@ services:
   # at this service (http://razorpay-stub:8090) to test /create-order against a
   # realistic Razorpay-shaped response instead of a hardcoded mock.
   razorpay-stub:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub contracts/razorpay/openapi.yaml --examples=contracts/razorpay/examples --port=8090
     ports:
       - "8090:8090"
 
   # LAB 1 — Provider contract test: hits real backend, validates against contract
   specmatic-test:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: test --testBaseURL=http://backend:3002 contracts/openapi.yaml
     depends_on:
       - backend
@@ -70,11 +68,10 @@ services:
 
   # LAB 2 — Consumer stub: fake backend from contract, no real backend needed
   specmatic-stub:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub contracts/openapi.yaml --port=9000
     ports:
       - "9000:9000"
@@ -83,11 +80,10 @@ services:
 
   # External Examples Validation — validates ALL example JSONs (including partial) against contract schema
   specmatic-examples:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: examples validate --contract-file=contracts/openapi.yaml --examples-dir=contracts/openapi_examples
     profiles:
       - examples
@@ -95,11 +91,10 @@ services:
 
   # LAB: Partial Examples — stub server that serves partial examples (auto-generates missing required fields)
   specmatic-partial-stub:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub contracts/openapi.yaml --examples=contracts/openapi_examples --port=9000
     ports:
       - "9000:9000"
@@ -108,11 +103,10 @@ services:
 
   # LAB: Partial Examples loop test — runs contract tests against the partial-examples stub
   specmatic-partial-test:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: test --testBaseURL=http://specmatic-partial-stub:9000 contracts/openapi.yaml
     depends_on:
       - specmatic-partial-stub
@@ -121,11 +115,10 @@ services:
 
   # LAB 4 — API Coverage: tests + coverage report
   specmatic-coverage:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: test --testBaseURL=http://backend:3002 contracts/openapi.yaml
     depends_on:
       backend:
@@ -137,11 +130,10 @@ services:
 
   # LAB: Response Templating — stub that echoes request values and does data lookups
   specmatic-rt-stub:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub contracts/openapi.yaml --examples=contracts/response_templates/mock --port=9000
     ports:
       - "9000:9000"
@@ -150,11 +142,10 @@ services:
 
   # LAB: Response Templating — contract tests against the template stub
   specmatic-rt-test:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: test --testBaseURL=http://specmatic-rt-stub:9000 contracts/openapi.yaml --examples=contracts/response_templates/test
     depends_on:
       - specmatic-rt-stub
@@ -163,11 +154,10 @@ services:
 
   # LAB: Dictionary — stub using domain-aware values from openapi_dictionary.yaml (auto-detected)
   specmatic-dictionary-stub:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub contracts/openapi.yaml --examples=contracts/openapi_examples --port=9000
     ports:
       - "9000:9000"
@@ -176,11 +166,10 @@ services:
 
   # LAB: Dictionary — contract tests against the dictionary stub
   specmatic-dictionary-test:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: test --testBaseURL=http://specmatic-dictionary-stub:9000 contracts/openapi.yaml
     depends_on:
       - specmatic-dictionary-stub
@@ -189,11 +178,10 @@ services:
 
   # LAB: Filters — stub for filter experiments (shared across all filter profiles)
   specmatic-filter-stub:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub contracts/openapi.yaml --examples=contracts/openapi_examples --port=9000
     ports:
       - "9000:9000"
@@ -204,11 +192,10 @@ services:
 
   # LAB: Filters — run ONLY STATUS=200 tests (happy-path focus)
   specmatic-filter-status:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: ["test", "--testBaseURL=http://specmatic-filter-stub:9000", "contracts/openapi.yaml", "--filter", "STATUS='200'"]
     depends_on:
       - specmatic-filter-stub
@@ -217,11 +204,10 @@ services:
 
   # LAB: Filters — run ONLY POST method tests
   specmatic-filter-post:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: ["test", "--testBaseURL=http://specmatic-filter-stub:9000", "contracts/openapi.yaml", "--filter", "METHOD='POST'"]
     depends_on:
       - specmatic-filter-stub
@@ -230,11 +216,10 @@ services:
 
   # LAB: Filters — run ONLY auth endpoint tests
   specmatic-filter-auth:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: ["test", "--testBaseURL=http://specmatic-filter-stub:9000", "contracts/openapi.yaml", "--filter", "PATH='/auth/signup' || PATH='/auth/login'"]
     depends_on:
       - specmatic-filter-stub
@@ -243,11 +228,10 @@ services:
 
   # LAB: Data Adapters — mock WITH adapters (reads hooks from specmatic.yaml, starts on port 8080)
   specmatic-adapter-mock:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: ["mock"]
     ports:
       - "8080:8080"
@@ -263,7 +247,7 @@ services:
 
   # LAB: Data Adapters — verify adapter works: PascalCase request succeeds with adapter
   specmatic-adapter-verify:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
@@ -280,11 +264,10 @@ services:
 
   # LAB: Data Adapters — stub WITHOUT adapters (working_dir=/tmp so specmatic.yaml not found)
   specmatic-no-adapter-stub:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /tmp
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub /usr/src/app/contracts/openapi.yaml --port=8081
     ports:
       - "8081:8081"
@@ -299,7 +282,7 @@ services:
 
   # LAB: Data Adapters — verify without adapter: same PascalCase request fails
   specmatic-no-adapter-verify:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
@@ -317,11 +300,10 @@ services:
 
   # LAB: Workflow — stub for workflow demo (uses /tmp to avoid reading specmatic.yaml)
   specmatic-workflow-stub:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /tmp
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: stub /usr/src/app/contracts/openapi.yaml --examples=/usr/src/app/contracts/openapi_examples --port=9000
     ports:
       - "9000:9000"
@@ -336,11 +318,10 @@ services:
 
   # LAB: Workflow — test only create-order + verify-payment to show ID propagation
   specmatic-workflow-test:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     command: ["test", "--testBaseURL=http://specmatic-workflow-stub:9000",
               "contracts/openapi.yaml",
               "--examples=contracts/openapi_examples",
@@ -364,10 +345,9 @@ services:
   # LAB: CI — Backward compatibility check: compares current branch contracts against main
   # Uses a temp git repo (no remote) to avoid JGit hanging on GitHub auth
   specmatic-backward-compat:
-    image: specmatic/enterprise:latest
+    image: specmatic/specmatic:2.49.1
     volumes:
       - .:/usr/src/app
-      - ../license.txt:/root/.specmatic/specmatic-license.txt:ro
     entrypoint: ["sh", "-c"]
     command:
       - |
@@ -390,8 +370,10 @@ services:
       - ci
 
   # LAB: Filters + Studio — run the full suite (auto-starts mock + runs tests) via specmatic.yaml v3
+  # NOTE: run-suite is an enterprise-only command, not available in the open-source
+  # specmatic/specmatic image. Kept on specmatic/enterprise:1.19.1 as a deliberate exception.
   specmatic-suite:
-    image: specmatic/enterprise:latest
+    image: specmatic/enterprise:1.19.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
@@ -401,8 +383,11 @@ services:
       - suite
 
   # ALL LABS — Specmatic Studio: visual UI at http://localhost:9000/_specmatic/studio
+  # NOTE: Studio is an enterprise-only feature, not available in the open-source
+  # specmatic/specmatic image (confirmed: "Unmatched argument at index 0: 'studio'").
+  # Kept on specmatic/enterprise:1.19.1 as a deliberate exception.
   studio:
-    image: specmatic/enterprise:latest
+    image: specmatic/enterprise:1.19.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app

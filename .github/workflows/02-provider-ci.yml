@@ -11,15 +11,9 @@ on:
 jobs:
   provider-contract-tests:
     runs-on: ubuntu-latest
-    env:
-      PUBLISH_TO_INSIGHTS: ${{ github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Write specmatic license key to file
-        run: |
-          echo "${{ secrets.SPECMATIC_LICENSE_KEY }}" > /tmp/specmatic-license.txt
 
       - name: Start MongoDB
         run: |
@@ -32,8 +26,7 @@ jobs:
           docker run -d --name razorpay-stub \
             --network host \
             -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
-            specmatic/enterprise:latest \
+            specmatic/specmatic:2.49.1 \
             stub contracts/razorpay/openapi.yaml \
             --examples=contracts/razorpay/examples \
             --port=8090
@@ -55,25 +48,8 @@ jobs:
           docker run --rm \
             --network host \
             -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
-            specmatic/enterprise:latest \
+            specmatic/specmatic:2.49.1 \
             test \
             --testBaseURL=http://localhost:3002 \
             contracts/openapi.yaml \
             --examples=contracts/openapi_examples
-
-      # Publish to Specmatic Insights on main branch only
-      - name: Publish report to Specmatic Insights
-        if: env.PUBLISH_TO_INSIGHTS == 'true'
-        run: |
-          docker run --rm \
-            --network host \
-            -v ${{ github.workspace }}:/usr/src/app \
-            -v /tmp/specmatic-license.txt:/root/.specmatic/specmatic-license.txt:ro \
-            specmatic/enterprise:latest \
-            send-report \
-            --metadata build_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} \
-            --branch-name ${{ github.ref_name }} \
-            --repo-name ${{ github.event.repository.name }} \
-            --repo-id ${{ github.repository_id }} \
-            --repo-url ${{ github.event.repository.html_url }}
