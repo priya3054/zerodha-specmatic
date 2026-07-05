@@ -1,0 +1,24 @@
+{
+  "http-request": {
+    "method": "POST",
+    "path": "/newOrder",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "name": "INFY",
+      "qty": 0,
+      "price": 1555.45,
+      "mode": "BUY"
+    }
+  },
+  "http-response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "error": "Invalid order payload"
+    }
+  }
+}

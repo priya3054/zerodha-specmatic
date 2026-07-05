@@ -122,6 +122,10 @@ workflows:
       value: "$inputs.getMe.X-Test-Username"
     successCriteria:
     - condition: "$statusCode == 200"
+  - stepId: "streamEvents"
+    operationId: "$sourceDescriptions.OpenapiApi.streamEvents"
+    successCriteria:
+    - condition: "$statusCode == 200"
   - stepId: "getAllHoldings"
     operationId: "$sourceDescriptions.OpenapiApi.getAllHoldings"
     successCriteria:

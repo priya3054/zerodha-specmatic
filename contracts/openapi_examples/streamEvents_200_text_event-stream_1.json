@@ -1,0 +1,13 @@
+{
+  "http-request": {
+    "method": "GET",
+    "path": "/events"
+  },
+  "http-response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/event-stream"
+    },
+    "body": "event: price-update\ndata: {\"name\":\"TCS\",\"price\":\"3194.80\"}\n\n"
+  }
+}

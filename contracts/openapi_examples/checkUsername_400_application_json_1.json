@@ -1,0 +1,15 @@
+{
+  "http-request": {
+    "method": "GET",
+    "path": "/auth/check-username"
+  },
+  "http-response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "available": false
+    }
+  }
+}

@@ -354,7 +354,6 @@ Each profile is self-contained; start it the same way — `docker compose --prof
 | `suite` | Runs the full `specmatic.yaml` v3 suite (auto-starts mock + runs tests) |
 | `studio` | Specmatic Studio visual UI at `http://localhost:9000/_specmatic/studio` |
 | `ci` | Spectral lint + backward-compatibility check + example validation (used in CI) |
-| `async` | Kafka-based async contract test (stock-orders → order-confirmed) via `order-processor` |
 
 ## 5. Walkthrough of the Core Labs
 
@@ -415,7 +414,7 @@ docker run --rm \
 
 ## 7. Arazzo End-to-End Workflow
 
-`ZerodhaTradeFlow.arazzo.yaml` (with data in `ZerodhaTradeFlow.arazzo_input.json`) chains **signup → login → get-me → place order → create order → verify payment** into one workflow. It was built visually in Specmatic Studio and exported.
+`ZerodhaTradeFlow.arazzo.yaml` (with data in `ZerodhaTradeFlow.arazzo_input.json`) chains **signup → login → get-me → connect to live events → place order → create order → verify payment** into one workflow. It was built visually in Specmatic Studio and exported.
 
 Run it against a live backend:
 
