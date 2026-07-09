@@ -1,0 +1,42 @@
+version: 3
+
+# LAB: Workflow — dedicated config for specmatic-workflow-test.
+# Identical to specmatic.yaml's systemUnderTest (workflow ID extraction +
+# securitySchemes), but WITHOUT schemaResiliencyTests: all. The workflow-test
+# runs against specmatic-workflow-stub, which returns plain-text errors for
+# malformed input rather than contract-shaped JSON, so resiliency's negative
+# tests always fail there — this lab demonstrates ID propagation, not
+# resiliency, so those tests are omitted rather than left failing.
+# (Setting SPECMATIC_GENERATIVE_TESTS=false does NOT suppress
+# schemaResiliencyTests: all from specmatic.yaml — that setting is a separate
+# switch, hence this separate config passed via `test --config=`.)
+systemUnderTest:
+  service:
+    definitions:
+      - definition:
+          source:
+            filesystem:
+              directory: contracts
+          specs:
+            - spec:
+                id: zerodhaApiSpec
+                path: openapi.yaml
+    runOptions:
+      openapi:
+        type: test
+        baseUrl: "http://localhost:8080"
+        workflow:
+          ids:
+            "POST /create-order -> 200":
+              extract: "BODY.id"
+        specs:
+          - spec:
+              id: zerodhaApiSpec
+              securitySchemes:
+                testAuth:
+                  type: apiKey
+                  token: spectest2
+    data:
+      examples:
+        - directories:
+            - ./contracts/openapi_examples

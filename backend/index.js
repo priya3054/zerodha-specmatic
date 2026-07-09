@@ -79,6 +79,56 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+// Specmatic actuator: reports the routes actually registered on this server,
+// in the same shape as Spring Boot's /actuator/mappings, so Specmatic can
+// flag "Missing In Spec" (implemented but undocumented) and "Not Implemented"
+// (documented but missing) operations during coverage analysis.
+function listRegisteredRoutes() {
+  const routes = [];
+  const collect = (stack, prefix) => {
+    stack.forEach((layer) => {
+      if (!layer.route) return;
+      const path = (prefix + layer.route.path).replace(/:([^/]+)/g, "{$1}");
+      const methods = Object.keys(layer.route.methods)
+        .filter((method) => layer.route.methods[method])
+        .map((method) => method.toUpperCase());
+      routes.push({ path, methods });
+    });
+  };
+  collect(app._router.stack, "");
+  collect(authRoutes.stack, "/auth");
+  return routes.filter(({ path }) => !path.startsWith("/actuator"));
+}
+
+app.get(["/actuator", "/actuator/mappings"], (req, res) => {
+  const dispatcherServlet = listRegisteredRoutes().map(({ path, methods }) => ({
+    handler: path,
+    predicate: `{${methods.join(",")} [${path}]}`,
+    details: {
+      handlerMethod: { name: path },
+      requestMappingConditions: {
+        consumes: [],
+        headers: [],
+        methods,
+        params: [],
+        patterns: [path],
+        produces: [],
+      },
+    },
+  }));
+
+  res.json({
+    contexts: {
+      application: {
+        mappings: {
+          dispatcherServlets: { dispatcherServlet },
+        },
+        parentId: null,
+      },
+    },
+  });
+});
+
 let priceInterval = null;
 
 async function getAllStockNames() {

@@ -113,13 +113,18 @@ services:
     profiles:
       - partial
 
-  # LAB 4 — API Coverage: tests + coverage report
+  # LAB 4 — API Coverage: tests + resiliency tests + coverage report.
+  # specmatic.yaml (auto-read from working_dir) supplies the actuatorUrl and
+  # governance.successCriteria gate, so this exits non-zero on insufficient
+  # coverage — also the service CI's provider-ci.yml runs for its gate.
   specmatic-coverage:
     image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
     command: test --testBaseURL=http://backend:3002 contracts/openapi.yaml
+    environment:
+      - SPECMATIC_GENERATIVE_TESTS=true
     depends_on:
       backend:
         condition: service_healthy
@@ -316,13 +321,22 @@ services:
     profiles:
       - workflow
 
-  # LAB: Workflow — test only create-order + verify-payment to show ID propagation
+  # LAB: Workflow — test only create-order + verify-payment to show ID propagation.
+  # Uses specmatic-workflow.yaml (via --config) instead of the auto-detected
+  # specmatic.yaml: that file's schemaResiliencyTests: all would otherwise
+  # apply here too, and this stub returns plain-text errors for malformed
+  # input rather than contract-shaped JSON, so generative negative tests
+  # against it always fail — ID propagation, not resiliency, is what this lab
+  # demonstrates. (SPECMATIC_GENERATIVE_TESTS=false does NOT suppress
+  # schemaResiliencyTests, which is a separate setting — hence --config
+  # instead of an env var.)
   specmatic-workflow-test:
     image: specmatic/specmatic:2.49.1
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
     command: ["test", "--testBaseURL=http://specmatic-workflow-stub:9000",
+              "--config=specmatic-workflow.yaml",
               "contracts/openapi.yaml",
               "--examples=contracts/openapi_examples",
               "--filter", "PATH='/create-order' || PATH='/verify-payment'"]

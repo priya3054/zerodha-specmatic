@@ -3,6 +3,12 @@ name: Provider CI (Backend Contract Tests)
 # LAB: Continuous Integration — Gate 2: Provider pipeline
 # Tests the real Zerodha Express backend against the contract.
 # Catches backend regressions before they hit shared environments.
+#
+# Runs via docker-compose (not ad-hoc `docker run`) so CI uses the exact same
+# bridge network, service hostnames, and working directory as local dev —
+# which matters because specmatic.yaml's actuatorUrl (http://backend:3002/...)
+# and governance coverage gate are only picked up when Specmatic runs with
+# /usr/src/app as its working directory and "backend" resolves as a hostname.
 
 on:
   push:
@@ -15,41 +21,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Start MongoDB
+      # Contract tests + schema resiliency tests + actuator-backed API coverage
+      # gate against the real backend. specmatic.yaml enforces
+      # minCoveragePercentage/maxMissedOperationsInSpec, so this step fails the
+      # job on insufficient coverage, not just on request/response mismatches.
+      - name: Run provider contract + resiliency tests (with coverage gate)
         run: |
-          docker run -d --name mongo \
-            -p 27017:27017 \
-            mongo:7
+          docker compose --profile coverage up \
+            --build --abort-on-container-exit --exit-code-from specmatic-coverage
 
-      - name: Start Razorpay stub
-        run: |
-          docker run -d --name razorpay-stub \
-            --network host \
-            -v ${{ github.workspace }}:/usr/src/app \
-            specmatic/specmatic:2.49.1 \
-            stub contracts/razorpay/openapi.yaml \
-            --examples=contracts/razorpay/examples \
-            --port=8090
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: specmatic-coverage-report
+          path: build/reports/specmatic
+          if-no-files-found: ignore
 
-      - name: Start Zerodha backend
-        run: |
-          cd backend
-          npm install
-          PORT=3002 MONGO_URL=mongodb://localhost:27017/zerodha \
-            RAZORPAY_KEY_ID=test_key RAZORPAY_KEY_SECRET=test_secret \
-            RAZORPAY_BASE_URL=http://localhost:8090 \
-            NODE_ENV=test \
-            npm start &
-          sleep 15
+      - name: Tear down
+        if: always()
+        run: docker compose --profile coverage down -v
 
-      # Run contract tests: Specmatic sends requests defined in the contract to the real backend
-      - name: Run Specmatic contract tests against backend
+      # Workflow test: extracts the order id from POST /create-order's response
+      # and propagates it into POST /verify-payment, proving multi-step
+      # request chaining works end to end — not just isolated endpoints.
+      - name: Run workflow test (create-order -> verify-payment ID propagation)
         run: |
-          docker run --rm \
-            --network host \
-            -v ${{ github.workspace }}:/usr/src/app \
-            specmatic/specmatic:2.49.1 \
-            test \
-            --testBaseURL=http://localhost:3002 \
-            contracts/openapi.yaml \
-            --examples=contracts/openapi_examples
+          docker compose --profile workflow up \
+            --build --abort-on-container-exit --exit-code-from specmatic-workflow-test
+
+      - name: Tear down workflow stack
+        if: always()
+        run: docker compose --profile workflow down -v

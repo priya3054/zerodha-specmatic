@@ -17,6 +17,10 @@ systemUnderTest:
       openapi:
         type: test
         baseUrl: "http://localhost:8080"
+        # actuator: reports routes actually registered on the real backend
+        # (see backend/index.js GET /actuator/mappings) so Specmatic can flag
+        # "Missing In Spec" / "Not Implemented" during API coverage analysis.
+        actuatorUrl: http://backend:3002/actuator/mappings
         # LAB: Workflow — extract ID from create-order response, propagate to verify-payment.
         # Specmatic v1.14.2 supports extract from BODY and use via PATH params only.
         # Our Zerodha API uses body fields (not path params), so we demonstrate extract only.
@@ -72,4 +76,16 @@ specmatic:
     test:
       # strictMode: true
       schemaResiliencyTests: all
-      
+  # Coverage gate: fail the run if any contract operation goes untested, or if
+  # the backend implements routes the contract doesn't document (requires the
+  # actuatorUrl above to be reachable).
+  governance:
+    report:
+      formats:
+        - html
+      outputDirectory: build/reports/specmatic
+    successCriteria:
+      enforce: true
+      maxMissedOperationsInSpec: 0
+      minCoveragePercentage: 100
+
